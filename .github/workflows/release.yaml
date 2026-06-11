@@ -140,7 +140,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       # ------------------------------------------------------------------
-      # 9. Send Notification & Upload Files to Bale Messenger (Python Client)
+      # 9. Send Notification & Upload Files to Bale Messenger (Encrypted ZIP)
       # ------------------------------------------------------------------
       - name: Send Files and Notification to Bale
         env:
@@ -151,13 +151,16 @@ jobs:
         run: |
           pip install requests
           python -c '
-          import os, glob, requests
+          import os, glob, requests, subprocess
 
           bot_token = os.environ.get("BOT_TOKEN")
           chat_id = os.environ.get("CHAT_ID")
           release_name = os.environ.get("RELEASE_NAME")
           release_url = os.environ.get("RELEASE_URL")
           base_url = f"https://tapi.bale.ai/bot{bot_token}"
+          
+          # رمز عبور ثابت برای دور زدن فیلتر
+          zip_password = "123"
 
           # ۱. ارسال پیام متنی اولیه
           msg_text = f"🚀 **نسخه جدید منتشر شد: {release_name}**\n\nفایل‌های خروجی در حال آپلود مستقیم در کانال هستند...\n\n🔗 [مشاهده تغییرات در گیت‌هاب]({release_url})"
@@ -167,31 +170,41 @@ jobs:
           except Exception as e:
               print(f"[WARNING] Could not send initial message: {e}")
 
-          # ۲. آپلود فایل‌ها با استتار امنیتی
+          # ۲. فشرده‌سازی و آپلود فایل‌ها
           for file_path in glob.glob("release-assets/*"):
               if not os.path.isfile(file_path): 
                   continue
                   
               original_filename = os.path.basename(file_path)
               
-              # فیلتر کردن AAB (عدم کاربرد برای یوزر نهایی و حجم بالا)
               if original_filename.endswith(".aab"):
-                  print(f"[SKIP] Ignoring {original_filename} (Store format only)")
+                  print(f"[SKIP] Ignoring {original_filename}")
                   continue
 
-              # استتار نام فایل برای دور زدن فایروال بله
+              upload_filepath = file_path
               upload_filename = original_filename
               caption_text = f"📦 فایل خروجی: `{original_filename}`"
               
+              # اگر فایل APK است، آن را واقعاً با پسورد زیپ کن
               if original_filename.endswith(".apk"):
-                  upload_filename = f"{original_filename}.zip"
-                  caption_text += "\n\n⚠️ **توجه:** برای دور زدن محدودیت‌های پیام‌رسان، فایل با پسوند `.zip` ارسال شده است. لطفاً پس از دانلود، `.zip` را از انتهای نام فایل پاک کرده (Rename) و سپس آن را نصب کنید."
+                  zip_filename = f"{original_filename}.zip"
+                  zip_filepath = f"release-assets/{zip_filename}"
+                  
+                  print(f"\n[*] Compressing and encrypting {original_filename}...")
+                  
+                  # استفاده از دستور zip لینوکس: 
+                  # فلگ -j باعث می‌شود فقط خود فایل زیپ شود نه پوشه‌های مسیرش
+                  # فلگ -P پسورد را اعمال می‌کند
+                  subprocess.run(["zip", "-j", "-P", zip_password, zip_filepath, file_path], check=True)
+                  
+                  upload_filepath = zip_filepath
+                  upload_filename = zip_filename
+                  caption_text += f"\n\n🔒 **توجه:** برای عبور از فیلتر پیام‌رسان بله، فایل به صورت رمزگذاری‌شده فشرده شده است.\n🔑 **رمز فایل:** `{zip_password}`"
 
-              print(f"\n[→] Uploading {original_filename} as {upload_filename}...")
+              print(f"\n[→] Uploading {upload_filename}...")
               
-              with open(file_path, "rb") as f:
+              with open(upload_filepath, "rb") as f:
                   try:
-                      # ارسال نام جعلی (upload_filename) در تاپل فایل به جای نام اصلی
                       resp = requests.post(
                           f"{base_url}/sendDocument",
                           data={"chat_id": chat_id, "caption": caption_text, "parse_mode": "Markdown"},
@@ -199,9 +212,9 @@ jobs:
                           timeout=300
                       )
                       if resp.status_code == 200:
-                          print(f"[OK] {original_filename} uploaded successfully.")
+                          print(f"[OK] {upload_filename} uploaded successfully.")
                       else:
-                          print(f"[ERROR] Failed to upload {original_filename}. HTTP {resp.status_code}: {resp.text}")
+                          print(f"[ERROR] Failed to upload {upload_filename}. HTTP {resp.status_code}: {resp.text}")
                   except Exception as e:
                       print(f"[FATAL] Unexpected error: {e}")
           '
