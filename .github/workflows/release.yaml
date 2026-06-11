@@ -157,23 +157,22 @@ jobs:
             -d text="${MAIN_MESSAGE}" \
             -d parse_mode="Markdown"
 
-          # ۲. حلقه ارسال فایل‌ها با مسیر مطلق و لاگ‌گیری دقیق
+          # ۲. حلقه ارسال فایل‌ها با رفع مشکل 100-continue و تایم‌اوت
           echo "Starting target asset uploads to Bale Channel..."
           for file in release-assets/*; do
             if [ -f "$file" ]; then
               filename=$(basename "$file")
-              filesize=$(stat -c%s "$file") # محاسبه حجم فایل برای دیباگ
+              filesize=$(stat -c%s "$file")
               
-              echo "================================================="
-              echo "Uploading artifact: $filename"
-              echo "Size: $filesize bytes"
-              echo "Path: $GITHUB_WORKSPACE/$file"
-              echo "================================================="
+              echo "Uploading artifact: $filename ($filesize bytes)"
               
-              # استفاده از مسیر مطلق GITHUB_WORKSPACE و افزودن -v برای نمایش جزئیات خطا
-              curl -v -X POST "https://tapi.bale.ai/bot${BOT_TOKEN}/sendDocument" \
+              # استفاده از -H "Expect:" برای جلوگیری از قطع ناگهانی ارتباط
+              # استفاده از --http1.1 برای سازگاری بهتر با سرور بله
+              # اضافه کردن تایم‌اوت برای جلوگیری از معلق ماندن جاب
+              curl -s --http1.1 --connect-timeout 30 --max-time 300 -X POST "https://tapi.bale.ai/bot${BOT_TOKEN}/sendDocument" \
+                -H "Expect:" \
                 -F chat_id="${CHAT_ID}" \
-                -F document=@"${GITHUB_WORKSPACE}/${file}" \
+                -F document=@"$file" \
                 -F caption="📦 فایل خروجی: \`$filename\`" \
                 -F parse_mode="Markdown"
                 
