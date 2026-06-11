@@ -62,6 +62,8 @@ flutter:
   fonts:
     - family: Vazirmatn
       fonts:
+        # NOTE: This font file is currently a placeholder to prevent loading errors.
+        # Replace with a real TTF file to use this font family.
         - asset: assets/fonts/Vazirmatn-Regular.ttf
 
   # To add assets to your application, add an assets section, like this:
