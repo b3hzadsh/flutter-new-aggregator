@@ -15,9 +15,9 @@ class RssDataSource {
     final document = XmlDocument.parse(xmlString);
     final items = document.findAllElements('item');
     return items.map((node) {
-      final title = node.findElements('title').first.innerText;
-      final description = node.findElements('description').first.innerText;
-      final link = node.findElements('link').first.innerText;
+      final title = node.findElements('title').firstOrNull?.innerText ?? '';
+      final description = node.findElements('description').firstOrNull?.innerText ?? '';
+      final link = node.findElements('link').firstOrNull?.innerText ?? '';
       return NewsItem(
         remoteId: link,
         title: title,

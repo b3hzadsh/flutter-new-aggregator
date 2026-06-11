@@ -43,4 +43,27 @@ void main() {
     expect(items.first.sourceName, "Test Source");
     // publishDate check will be added in Task 4
   });
+
+  test('should handle missing tags gracefully', () async {
+    const xml = '''
+    <rss version="2.0">
+      <channel>
+        <item>
+        </item>
+      </channel>
+    </rss>''';
+
+    when(() => mockDio.get(any())).thenAnswer((_) async => Response(
+      data: xml,
+      statusCode: 200,
+      requestOptions: RequestOptions(path: ''),
+    ));
+
+    final items = await dataSource.fetchFeed("https://test.com/rss", "Test Source");
+    
+    expect(items.length, 1);
+    expect(items.first.title, "");
+    expect(items.first.content, "");
+    expect(items.first.remoteId, "");
+  });
 }
