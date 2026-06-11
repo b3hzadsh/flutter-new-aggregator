@@ -14,7 +14,7 @@ if (keystorePropertiesFile.exists()) {
 }
 android {
     namespace = "com.bsh.khm.co.news_aggregator"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36 // flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
