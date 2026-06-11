@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/news_cubit.dart';
+import '../pages/news_detail_page.dart';
 import '../widgets/news_card.dart';
 
 class NewsListPage extends StatefulWidget {
@@ -99,7 +100,18 @@ class _NewsListPageState extends State<NewsListPage> {
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      return NewsCard(item: state.items[index]);
+                      final item = state.items[index];
+                      return NewsCard(
+                        item: item,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => NewsDetailPage(item: item),
+                            ),
+                          );
+                        },
+                      );
                     },
                     childCount: state.items.length,
                   ),
