@@ -102,7 +102,7 @@ jobs:
           retention-days: 30
 
   # ----------------------------------------------------------------------
-  # 8. Create GitHub Release & Notify Bale
+  # 8. Create GitHub Release & Upload Directly to Bale Channel
   # ----------------------------------------------------------------------
   create-release:
     needs: build-android
@@ -120,7 +120,7 @@ jobs:
           ls -la release-assets/
 
       - name: Create GitHub Release
-        id: create_release # اضافه شدن ID برای استفاده در مرحله بعد
+        id: create_release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.ref_name }}
@@ -140,19 +140,36 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       # ------------------------------------------------------------------
-      # 9. Send Notification to Bale Messenger
+      # 9. Send Notification & Upload Files to Bale Messenger
       # ------------------------------------------------------------------
-      - name: Send Notification to Bale
+      - name: Send Files and Notification to Bale
         env:
           BOT_TOKEN: ${{ secrets.BALE_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.BALE_CHAT_ID }}
           RELEASE_NAME: "News Aggregator ${{ github.ref_name }}"
           RELEASE_URL: ${{ steps.create_release.outputs.html_url }}
         run: |
-          MESSAGE="🚀 **نسخه جدید منتشر شد: $RELEASE_NAME**%0A%0Aفایل‌های نصبی (APK) و نسخه فروشگاه (AAB) در گیت‌هاب قرار گرفتند.%0A%0A🔗 [دانلود فایل‌ها و مشاهده تغییرات]($RELEASE_URL)"
-
-          # ارسال به پیام‌رسان بله (استفاده از tapi.bale.ai به جای api.telegram.org)
+          # ۱. ارسال پیام متنی اولیه جهت اطلاع‌رسانی
+          MAIN_MESSAGE="🚀 **نسخه جدید منتشر شد: $RELEASE_NAME**%0A%0Aفایل‌های خروجی در حال آپلود مستقیم در کانال هستند...%0A%0A🔗 [مشاهده تغییرات در گیت‌هاب]($RELEASE_URL)"
+          
           curl -s -X POST "https://tapi.bale.ai/bot${BOT_TOKEN}/sendMessage" \
             -d chat_id="${CHAT_ID}" \
-            -d text="${MESSAGE}" \
+            -d text="${MAIN_MESSAGE}" \
             -d parse_mode="Markdown"
+
+          # ۲. حلقه برای ارسال تک‌تک فایل‌های خروجی موجود در پوشه دارایی‌ها
+          echo "Starting target asset uploads to Bale Channel..."
+          for file in release-assets/*; do
+            if [ -f "$file" ]; then
+              filename=$(basename "$file")
+              echo "Uploading artifact: $filename"
+              
+              # استفاده از متد sendDocument و هدر multipart/form-data
+              curl -s -X POST "https://tapi.bale.ai/bot${BOT_TOKEN}/sendDocument" \
+                -F chat_id="${CHAT_ID}" \
+                -F document=@"$file" \
+                -F caption="📦 فایل خروجی: \`$filename\`" \
+                -F parse_mode="Markdown"
+            fi
+          done
+          echo "All release assets uploaded successfully to Bale."
