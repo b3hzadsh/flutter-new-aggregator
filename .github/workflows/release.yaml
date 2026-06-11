@@ -167,28 +167,41 @@ jobs:
           except Exception as e:
               print(f"[WARNING] Could not send initial message: {e}")
 
-          # ۲. آپلود فایل‌ها
+          # ۲. آپلود فایل‌ها با استتار امنیتی
           for file_path in glob.glob("release-assets/*"):
               if not os.path.isfile(file_path): 
                   continue
                   
-              filename = os.path.basename(file_path)
-              print(f"\n[→] Uploading {filename}...")
+              original_filename = os.path.basename(file_path)
+              
+              # فیلتر کردن AAB (عدم کاربرد برای یوزر نهایی و حجم بالا)
+              if original_filename.endswith(".aab"):
+                  print(f"[SKIP] Ignoring {original_filename} (Store format only)")
+                  continue
+
+              # استتار نام فایل برای دور زدن فایروال بله
+              upload_filename = original_filename
+              caption_text = f"📦 فایل خروجی: `{original_filename}`"
+              
+              if original_filename.endswith(".apk"):
+                  upload_filename = f"{original_filename}.zip"
+                  caption_text += "\n\n⚠️ **توجه:** برای دور زدن محدودیت‌های پیام‌رسان، فایل با پسوند `.zip` ارسال شده است. لطفاً پس از دانلود، `.zip` را از انتهای نام فایل پاک کرده (Rename) و سپس آن را نصب کنید."
+
+              print(f"\n[→] Uploading {original_filename} as {upload_filename}...")
               
               with open(file_path, "rb") as f:
                   try:
+                      # ارسال نام جعلی (upload_filename) در تاپل فایل به جای نام اصلی
                       resp = requests.post(
                           f"{base_url}/sendDocument",
-                          data={"chat_id": chat_id, "caption": f"📦 فایل خروجی: `{filename}`", "parse_mode": "Markdown"},
-                          files={"document": (filename, f)},
+                          data={"chat_id": chat_id, "caption": caption_text, "parse_mode": "Markdown"},
+                          files={"document": (upload_filename, f)},
                           timeout=300
                       )
                       if resp.status_code == 200:
-                          print(f"[OK] {filename} uploaded successfully.")
+                          print(f"[OK] {original_filename} uploaded successfully.")
                       else:
-                          print(f"[ERROR] Failed to upload {filename}. HTTP {resp.status_code}: {resp.text}")
-                  except requests.exceptions.ConnectionError as e:
-                      print(f"[FATAL] Connection dropped by Bale servers while uploading {filename}. Error: {e}")
+                          print(f"[ERROR] Failed to upload {original_filename}. HTTP {resp.status_code}: {resp.text}")
                   except Exception as e:
                       print(f"[FATAL] Unexpected error: {e}")
           '
