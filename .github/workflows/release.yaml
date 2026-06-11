@@ -135,18 +135,17 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.ref_name }}
-          name: "مسیریاب مترو تهران ${{ github.ref_name }}"
+          name: "News Aggregator ${{ github.ref_name }}"
           body: |
-            مسیریاب مترو تهران منتشر شد!
+            News Aggregator release version ${{ github.ref_name }}
 
-            دانلود برای اندروید:
-            • فایل AAB (برای گوگل پلی و مایکت)
-            • APKهای جدا شده برای ABIهای مختلف (arm64-v8a, armeabi-v7a, x86_64)
+            Download for Android:
+            • AAB file (for Google Play and Myket)
+            • Split APKs for different ABIs (arm64-v8a, armeabi-v7a, x86_64)
 
-            تغییرات نسخه:
-            - بهبود عملکرد
-            - رفع باگ های جزئی
-            - اضافه شدن ویژگی جدید
+            What's New:
+            - Initial release or latest updates
+            - Bug fixes and performance improvements
           artifacts: "release-assets/*"
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
