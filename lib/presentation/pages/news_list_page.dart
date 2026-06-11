@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/news_cubit.dart';
 import '../widgets/news_card.dart';
-import '../../data/services/sync_service.dart';
 
 class NewsListPage extends StatelessWidget {
   const NewsListPage({super.key});
@@ -30,7 +29,7 @@ class NewsListPage extends StatelessWidget {
                     Text('خطا: ${state.error}', textAlign: TextAlign.center),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () => context.read<SyncService>().sync(),
+                      onPressed: () => context.read<NewsCubit>().sync(),
                       child: const Text('تلاش مجدد'),
                     ),
                   ],
@@ -47,7 +46,7 @@ class NewsListPage extends StatelessWidget {
                   const Text('خبری یافت نشد'),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => context.read<SyncService>().sync(),
+                    onPressed: () => context.read<NewsCubit>().sync(),
                     child: const Text('به‌روزرسانی'),
                   ),
                 ],
@@ -56,7 +55,7 @@ class NewsListPage extends StatelessWidget {
           }
 
           return RefreshIndicator(
-            onRefresh: () => context.read<SyncService>().sync(),
+            onRefresh: () => context.read<NewsCubit>().sync(),
             child: ListView.builder(
               itemCount: state.items.length,
               itemBuilder: (context, index) {
