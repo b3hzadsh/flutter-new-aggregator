@@ -1,0 +1,152 @@
+name: Build and Release Flutter App
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ------------------------------------------------------------------
+      # 1. Java + Flutter setup
+      # ------------------------------------------------------------------
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.0
+          channel: stable
+          cache: true
+
+      # ------------------------------------------------------------------
+      # 2. Cache pub dependencies (huge time saver)
+      # ------------------------------------------------------------------
+      - name: Cache pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool/package_config.json
+          key: ${{ runner.os }}-flutter-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-pub-
+
+      # ------------------------------------------------------------------
+      # 4. Create .env file from secrets
+      # ------------------------------------------------------------------
+      # - name: Create .env file
+      #   run: |
+      #     cat <<EOF > .env
+      #     SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+      #     WEB_CLIENT_ID=${{ secrets.WEB_CLIENT_ID }}
+      #     ANDROID_CLIENT_ID=${{ secrets.ANDROID_CLIENT_ID }}
+      #     SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+      #     EOF
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      # ------------------------------------------------------------------
+      # 5. Decode signing keystore (only for AAB)
+      # ------------------------------------------------------------------
+      - name: Decode and create keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          mkdir -p android/app
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/key.jks
+          cat <<EOF > android/key.properties
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=key.jks
+          EOF
+
+      # ------------------------------------------------------------------
+      # 6. Build both APK (split) + AAB in parallel inside the same job
+      # ------------------------------------------------------------------
+      - name: Build Release APK (split per ABI)
+        run: flutter build apk --release --split-per-abi
+
+      - name: Build Release App Bundle (AAB)
+        run: flutter build appbundle --release --obfuscate --split-debug-info=build/debug-info --tree-shake-icons
+
+      # ------------------------------------------------------------------
+      # 7. Upload artifacts
+      # ------------------------------------------------------------------
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-release
+          path: build/app/outputs/flutter-apk/*.apk
+          retention-days: 30
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: appbundle-release
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
+
+  # ----------------------------------------------------------------------
+  # 8. Create GitHub Release (only on real tags)
+  # ----------------------------------------------------------------------
+  create-release:
+    needs: build-android
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          find . -name "*.apk" -o -name "*.aab" | xargs -I {} cp {} release-assets/
+          ls -la release-assets/
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: "مسیریاب مترو تهران ${{ github.ref_name }}"
+          body: |
+            مسیریاب مترو تهران منتشر شد!
+
+            دانلود برای اندروید:
+            • فایل AAB (برای گوگل پلی و مایکت)
+            • APKهای جدا شده برای ABIهای مختلف (arm64-v8a, armeabi-v7a, x86_64)
+
+            تغییرات نسخه:
+            - بهبود عملکرد
+            - رفع باگ های جزئی
+            - اضافه شدن ویژگی جدید
+          artifacts: "release-assets/*"
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
