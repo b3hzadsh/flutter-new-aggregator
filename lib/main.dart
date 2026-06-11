@@ -1,74 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_aggregator/presentation/theme/app_theme.dart';
+import 'package:news_aggregator/data/storage/objectbox_store.dart';
+import 'package:news_aggregator/data/sources/rss_data_source.dart';
+import 'package:news_aggregator/data/services/sync_service.dart';
+import 'package:news_aggregator/presentation/cubits/news_cubit.dart';
+import 'package:news_aggregator/presentation/pages/news_list_page.dart';
+import 'package:dio/dio.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final db = await ObjectBoxStore.create();
+  final dio = Dio();
+  final rssDataSource = RssDataSource(dio);
+  final syncService = SyncService(rssDataSource, db);
+
+  // Trigger initial sync
+  syncService.sync();
+
+  runApp(MyApp(
+    db: db,
+    syncService: syncService,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final ObjectBoxStore db;
+  final SyncService syncService;
+
+  const MyApp({
+    super.key,
+    required this.db,
+    required this.syncService,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'خبرخوان ایرانی',
-      theme: AppTheme.lightTheme,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider.value(value: db),
+        RepositoryProvider.value(value: syncService),
       ],
-      supportedLocales: const [
-        Locale('fa', 'IR'),
-      ],
-      locale: const Locale('fa', 'IR'),
-      home: const MyHomePage(title: 'خبرخوان ایرانی'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('تعداد دفعات فشرده شدن دکمه:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+      child: BlocProvider(
+        create: (context) => NewsCubit(db),
+        child: MaterialApp(
+          title: 'خبرخوان ایرانی',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
           ],
+          supportedLocales: const [
+            Locale('fa', 'IR'),
+          ],
+          locale: const Locale('fa', 'IR'),
+          home: const NewsListPage(),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'افزایش',
-        child: const Icon(Icons.add),
       ),
     );
   }
