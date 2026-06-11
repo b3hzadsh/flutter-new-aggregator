@@ -53,18 +53,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-flutter-pub-
 
-      # ------------------------------------------------------------------
-      # 4. Create .env file from secrets
-      # ------------------------------------------------------------------
-      # - name: Create .env file
-      #   run: |
-      #     cat <<EOF > .env
-      #     SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-      #     WEB_CLIENT_ID=${{ secrets.WEB_CLIENT_ID }}
-      #     ANDROID_CLIENT_ID=${{ secrets.ANDROID_CLIENT_ID }}
-      #     SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
-      #     EOF
-
       - name: Flutter pub get
         run: flutter pub get
 
@@ -114,7 +102,7 @@ jobs:
           retention-days: 30
 
   # ----------------------------------------------------------------------
-  # 8. Create GitHub Release (only on real tags)
+  # 8. Create GitHub Release & Notify Bale
   # ----------------------------------------------------------------------
   create-release:
     needs: build-android
@@ -132,6 +120,7 @@ jobs:
           ls -la release-assets/
 
       - name: Create GitHub Release
+        id: create_release # اضافه شدن ID برای استفاده در مرحله بعد
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.ref_name }}
@@ -149,3 +138,21 @@ jobs:
           artifacts: "release-assets/*"
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ------------------------------------------------------------------
+      # 9. Send Notification to Bale Messenger
+      # ------------------------------------------------------------------
+      - name: Send Notification to Bale
+        env:
+          BOT_TOKEN: ${{ secrets.BALE_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.BALE_CHAT_ID }}
+          RELEASE_NAME: "News Aggregator ${{ github.ref_name }}"
+          RELEASE_URL: ${{ steps.create_release.outputs.html_url }}
+        run: |
+          MESSAGE="🚀 **نسخه جدید منتشر شد: $RELEASE_NAME**%0A%0Aفایل‌های نصبی (APK) و نسخه فروشگاه (AAB) در گیت‌هاب قرار گرفتند.%0A%0A🔗 [دانلود فایل‌ها و مشاهده تغییرات]($RELEASE_URL)"
+
+          # ارسال به پیام‌رسان بله (استفاده از tapi.bale.ai به جای api.telegram.org)
+          curl -s -X POST "https://tapi.bale.ai/bot${BOT_TOKEN}/sendMessage" \
+            -d chat_id="${CHAT_ID}" \
+            -d text="${MESSAGE}" \
+            -d parse_mode="Markdown"
