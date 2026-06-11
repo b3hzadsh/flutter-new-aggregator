@@ -149,7 +149,7 @@ jobs:
           RELEASE_NAME: "News Aggregator ${{ github.ref_name }}"
           RELEASE_URL: ${{ steps.create_release.outputs.html_url }}
         run: |
-          # ۱. ارسال پیام متنی اولیه جهت اطلاع‌رسانی
+          # ۱. پیام متنی اولیه
           MAIN_MESSAGE="🚀 **نسخه جدید منتشر شد: $RELEASE_NAME**%0A%0Aفایل‌های خروجی در حال آپلود مستقیم در کانال هستند...%0A%0A🔗 [مشاهده تغییرات در گیت‌هاب]($RELEASE_URL)"
           
           curl -s -X POST "https://tapi.bale.ai/bot${BOT_TOKEN}/sendMessage" \
@@ -157,19 +157,26 @@ jobs:
             -d text="${MAIN_MESSAGE}" \
             -d parse_mode="Markdown"
 
-          # ۲. حلقه برای ارسال تک‌تک فایل‌های خروجی موجود در پوشه دارایی‌ها
+          # ۲. حلقه ارسال فایل‌ها با مسیر مطلق و لاگ‌گیری دقیق
           echo "Starting target asset uploads to Bale Channel..."
           for file in release-assets/*; do
             if [ -f "$file" ]; then
               filename=$(basename "$file")
-              echo "Uploading artifact: $filename"
+              filesize=$(stat -c%s "$file") # محاسبه حجم فایل برای دیباگ
               
-              # استفاده از متد sendDocument و هدر multipart/form-data
-              curl -s -X POST "https://tapi.bale.ai/bot${BOT_TOKEN}/sendDocument" \
+              echo "================================================="
+              echo "Uploading artifact: $filename"
+              echo "Size: $filesize bytes"
+              echo "Path: $GITHUB_WORKSPACE/$file"
+              echo "================================================="
+              
+              # استفاده از مسیر مطلق GITHUB_WORKSPACE و افزودن -v برای نمایش جزئیات خطا
+              curl -v -X POST "https://tapi.bale.ai/bot${BOT_TOKEN}/sendDocument" \
                 -F chat_id="${CHAT_ID}" \
-                -F document=@"$file" \
+                -F document=@"${GITHUB_WORKSPACE}/${file}" \
                 -F caption="📦 فایل خروجی: \`$filename\`" \
                 -F parse_mode="Markdown"
+                
+              echo -e "\nUpload step finished for $filename."
             fi
           done
-          echo "All release assets uploaded successfully to Bale."
