@@ -17,6 +17,7 @@ class NewsItem {
   final String sourceName;
   
   @Index()
+  @Property(type: PropertyType.date)
   final DateTime publishDate;
   
   bool isRead;
