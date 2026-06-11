@@ -34,7 +34,7 @@ class NewsCard extends StatelessWidget {
                     item.imageUrl!,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
-                      color: theme.colorScheme.surfaceVariant,
+                      color: theme.colorScheme.surfaceContainerHighest,
                       child: const Icon(Icons.broken_image, size: 48),
                     ),
                   ),
