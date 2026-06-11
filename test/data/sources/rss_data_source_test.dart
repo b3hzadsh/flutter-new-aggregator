@@ -28,7 +28,7 @@ void main() {
     </rss>''';
 
     test('should parse RSS XML correctly with HTML stripping and date parsing', () {
-      final items = dataSource.parseRss(testXml, "Test Source");
+      final items = dataSource.parse(testXml, "Test Source");
 
       expect(items.length, 1);
       expect(items.first.title, "Test Title");
@@ -50,14 +50,14 @@ void main() {
         </channel>
       </rss>''';
 
-      final items = dataSource.parseRss(brokenXml, "Test Source");
+      final items = dataSource.parse(brokenXml, "Test Source");
       expect(items.length, 1);
       expect(items.first.title, "Only Title");
       expect(items.first.content, "");
     });
 
     test('should return empty list on malformed XML', () {
-      final items = dataSource.parseRss("not xml", "Test Source");
+      final items = dataSource.parse("not xml", "Test Source");
       expect(items, isEmpty);
     });
 

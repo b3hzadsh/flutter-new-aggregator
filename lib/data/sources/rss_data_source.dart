@@ -2,22 +2,24 @@ import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
 import '../../domain/entities/news_item.dart';
+import '../../domain/repositories/rss_parser.dart';
 
-class RssDataSource {
+class RssDataSource implements RssParser {
   final Dio dio;
   RssDataSource({required this.dio});
 
   Future<List<NewsItem>> fetchFeed(String url, String sourceName) async {
     try {
       final response = await dio.get(url);
-      return parseRss(response.data.toString(), sourceName);
+      return parse(response.data.toString(), sourceName);
     } catch (e) {
       // Log or handle error appropriately in a real app
       return [];
     }
   }
 
-  List<NewsItem> parseRss(String xmlString, String sourceName) {
+  @override
+  List<NewsItem> parse(String xmlString, String sourceName) {
     try {
       final document = XmlDocument.parse(xmlString);
       final items = document.findAllElements('item');
