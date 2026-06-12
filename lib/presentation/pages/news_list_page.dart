@@ -63,7 +63,11 @@ class _NewsListPageState extends State<NewsListPage> {
                   floating: true,
                   snap: true,
                   centerTitle: true,
-                  title: Text(state.selectedCategory?.name ?? 'تازه‌ترین اخبار'),
+                  title: Text(
+                    state.isShowingBookmarks
+                        ? 'اخبار ذخیره شده'
+                        : (state.selectedCategory?.name ?? 'تازه‌ترین اخبار'),
+                  ),
                   actions: [
                     BlocBuilder<ThemeCubit, ThemeMode>(
                       builder: (context, mode) {

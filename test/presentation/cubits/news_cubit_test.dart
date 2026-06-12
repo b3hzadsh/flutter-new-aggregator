@@ -3,7 +3,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:news_aggregator/data/services/sync_service.dart';
 import 'package:news_aggregator/domain/entities/news_item.dart';
 import 'package:news_aggregator/domain/entities/category.dart';
-import 'package:news_aggregator/domain/repositories/news_storage.dart';
 import 'package:news_aggregator/presentation/cubits/news_cubit.dart';
 import 'dart:async';
 import '../../mocks.dart';
@@ -127,5 +126,44 @@ void main() {
     expect(cubit.state.isLoading, isFalse);
     expect(cubit.state.error, equals('NO_INTERNET'));
     verifyNever(() => mockSyncService.sync(any()));
+  });
+
+  test('toggleBookmark calls storage', () async {
+    final item = NewsItem(id: 1, remoteId: '1', title: 'T', content: 'C', summary: 'S', sourceName: 'SN', publishDate: DateTime.now());
+    when(() => mockStorage.updateNewsStatus(1, isBookmarked: any(named: 'isBookmarked')))
+        .thenAnswer((_) async {});
+
+    await cubit.toggleBookmark(item);
+
+    verify(() => mockStorage.updateNewsStatus(1, isBookmarked: true)).called(1);
+  });
+
+  test('markAsRead calls storage if not read', () async {
+    final item = NewsItem(id: 1, remoteId: '1', title: 'T', content: 'C', summary: 'S', sourceName: 'SN', publishDate: DateTime.now(), isRead: false);
+    when(() => mockStorage.updateNewsStatus(1, isRead: true)).thenAnswer((_) async {});
+
+    await cubit.markAsRead(item);
+
+    verify(() => mockStorage.updateNewsStatus(1, isRead: true)).called(1);
+  });
+
+  test('showBookmarksOnly updates state and switches stream', () {
+    late StreamController<List<NewsItem>> bookmarkController;
+    bookmarkController = StreamController<List<NewsItem>>.broadcast();
+    when(() => mockStorage.watchBookmarks()).thenAnswer((_) => bookmarkController.stream);
+
+    cubit.showBookmarksOnly(true);
+    expect(cubit.state.isShowingBookmarks, isTrue);
+    verify(() => mockStorage.watchBookmarks()).called(1);
+    
+    bookmarkController.close();
+  });
+
+  test('clearDatabase calls storage', () async {
+    when(() => mockStorage.clearAllNews()).thenAnswer((_) async {});
+
+    await cubit.clearDatabase();
+
+    verify(() => mockStorage.clearAllNews()).called(1);
   });
 }

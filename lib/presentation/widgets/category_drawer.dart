@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/repositories/news_storage.dart';
 import '../../domain/entities/category.dart';
 import '../cubits/news_cubit.dart';
+import '../cubits/theme_cubit.dart';
 
 class CategoryDrawer extends StatefulWidget {
   const CategoryDrawer({super.key});
@@ -23,6 +24,7 @@ class _CategoryDrawerState extends State<CategoryDrawer> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<NewsCubit>();
+    final themeCubit = context.read<ThemeCubit>();
 
     return Drawer(
       child: Column(
@@ -56,8 +58,9 @@ class _CategoryDrawerState extends State<CategoryDrawer> {
                       children: [
                         ListTile(
                           title: const Text('همه اخبار'),
-                          selected: state.selectedCategory == null,
+                          selected: state.selectedCategory == null && !state.isShowingBookmarks,
                           onTap: () {
+                            cubit.showBookmarksOnly(false);
                             cubit.selectCategory(null);
                             Navigator.pop(context);
                           },
@@ -65,12 +68,45 @@ class _CategoryDrawerState extends State<CategoryDrawer> {
                         ...categories.map((category) => ListTile(
                               title: Text(category.name),
                               selected:
-                                  state.selectedCategory?.id == category.id,
+                                  state.selectedCategory?.id == category.id && !state.isShowingBookmarks,
                               onTap: () {
+                                cubit.showBookmarksOnly(false);
                                 cubit.selectCategory(category);
                                 Navigator.pop(context);
                               },
                             )),
+                        const Divider(),
+                        ListTile(
+                          leading: const Icon(Icons.bookmark),
+                          title: const Text('اخبار ذخیره شده'),
+                          selected: state.isShowingBookmarks,
+                          onTap: () {
+                            cubit.showBookmarksOnly(true);
+                            Navigator.pop(context);
+                          },
+                        ),
+                        BlocBuilder<ThemeCubit, ThemeMode>(
+                          builder: (context, mode) {
+                            return SwitchListTile(
+                              secondary: const Icon(Icons.dark_mode),
+                              title: const Text('حالت شب'),
+                              value: mode == ThemeMode.dark,
+                              onChanged: (_) => themeCubit.toggleTheme(),
+                            );
+                          },
+                        ),
+                        const Divider(),
+                        ListTile(
+                          leading: Icon(Icons.delete_sweep, color: Theme.of(context).colorScheme.error),
+                          title: Text(
+                            'پاک کردن تاریخچه',
+                            style: TextStyle(color: Theme.of(context).colorScheme.error),
+                          ),
+                          onTap: () {
+                            cubit.clearDatabase();
+                            Navigator.pop(context);
+                          },
+                        ),
                       ],
                     );
                   },
