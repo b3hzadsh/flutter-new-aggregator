@@ -74,6 +74,7 @@ class _NewsListPageState extends State<NewsListPage> {
                       },
                     ),
                   ],
+
                   bottom: PreferredSize(
                     preferredSize: const Size.fromHeight(70),
                     child: Padding(
@@ -131,12 +132,16 @@ class _NewsListPageState extends State<NewsListPage> {
                         return NewsCard(
                           item: item,
                           onTap: () {
+                            context.read<NewsCubit>().markAsRead(item);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => NewsDetailPage(item: item),
                               ),
                             );
+                          },
+                          onBookmarkToggle: () {
+                            context.read<NewsCubit>().toggleBookmark(item);
                           },
                         );
                       },
