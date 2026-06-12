@@ -73,13 +73,13 @@ class ObjectBoxStore implements NewsStorage {
       for (final entry in categoriesMap.entries) {
         final catData = entry.value;
         final category = Category(
-          remoteId: catData['id'],
+          slug: catData['id'],
           name: catData['name'],
         );
 
         // Upsert category
         final catQuery = categoryBox
-            .query(Category_.remoteId.equals(category.remoteId))
+            .query(Category_.slug.equals(category.slug))
             .build();
         final existingCat = catQuery.findFirst();
         catQuery.close();
@@ -115,14 +115,14 @@ class ObjectBoxStore implements NewsStorage {
 
   @override
   Stream<List<NewsItem>> watchItemsByCategory(String categoryRemoteId) {
-    final query = categoryBox.query(Category_.remoteId.equals(categoryRemoteId)).build();
+    final query = categoryBox.query(Category_.slug.equals(categoryRemoteId)).build();
     final category = query.findFirst();
     query.close();
     
     if (category == null) return Stream.value([]);
 
     final qBuilder = newsBox.query();
-    qBuilder.link(NewsItem_.feedSource, FeedSource_.category.equals(category.id));
+    qBuilder.link(NewsItem_.feed, FeedSource_.category.equals(category.id));
     
     return qBuilder
         .order(NewsItem_.publishDate, flags: Order.descending)
@@ -171,3 +171,6 @@ class ObjectBoxStore implements NewsStorage {
   @override
   Future<void> close() async => store.close();
 }
+
+
+

@@ -50,7 +50,7 @@ void main() {
     final insertedItems = captured.first as List<NewsItem>;
     expect(insertedItems.length, 1);
     expect(insertedItems.first.remoteId, 'id1');
-    expect(insertedItems.first.feedSource.target, feed);
+    expect(insertedItems.first.feed.target, feed);
   });
 
   test('sync should avoid duplicates based on remoteId', () async {

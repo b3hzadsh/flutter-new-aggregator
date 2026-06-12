@@ -63,7 +63,7 @@ void main() {
   });
 
   test('filters items by category', () async {
-    final category1 = Category(id: 1, remoteId: 'tech', name: 'Tech');
+    final category1 = Category(id: 1, slug: 'tech', name: 'Tech');
     
     final item1 = NewsItem(
       remoteId: '1',
@@ -78,9 +78,9 @@ void main() {
     verify(() => mockStorage.watchAllItems()).called(1);
 
     // Select category
-    cubit.selectCategory(category1.remoteId);
+    cubit.selectCategory(category1.slug);
     
-    expect(cubit.state.selectedCategoryId, category1.remoteId);
+    expect(cubit.state.selectedCategoryId, category1.slug);
     verify(() => mockStorage.watchItemsByCategory('tech')).called(1);
 
     categoryItemsController.add([item1]);

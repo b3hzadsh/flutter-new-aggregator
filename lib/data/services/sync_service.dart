@@ -35,7 +35,7 @@ class SyncService {
         
         for (final item in items) {
           if (existingRemoteIds.add(item.remoteId)) {
-            item.feedSource.target = feed;
+            item.feed.target = feed;
             allNewItems.add(item);
           }
         }

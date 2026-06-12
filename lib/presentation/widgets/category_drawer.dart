@@ -73,10 +73,10 @@ class _CategoryDrawerState extends State<CategoryDrawer> {
                         ...categories.map((category) => ListTile(
                               title: Text(category.name),
                               selected:
-                                  state.selectedCategoryId == category.remoteId && !state.isShowingBookmarks,
+                                  state.selectedCategoryId == category.slug && !state.isShowingBookmarks,
                               onTap: () {
                                 cubit.showBookmarksOnly(false);
-                                cubit.selectCategory(category.remoteId, categoryName: category.name);
+                                cubit.selectCategory(category.slug, categoryName: category.name);
                                 Navigator.pop(context);
                               },
                             )),
