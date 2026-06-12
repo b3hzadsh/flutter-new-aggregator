@@ -11,12 +11,14 @@ class NewsState {
   final bool isLoading;
   final String? error;
   final Category? selectedCategory;
+  final bool isShowingBookmarks;
 
   NewsState({
     required this.items,
     this.isLoading = false,
     this.error,
     this.selectedCategory,
+    this.isShowingBookmarks = false,
   });
 
   NewsState copyWith({
@@ -25,12 +27,14 @@ class NewsState {
     String? error,
     Category? selectedCategory,
     bool clearCategory = false,
+    bool? isShowingBookmarks,
   }) {
     return NewsState(
       items: items ?? this.items,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       selectedCategory: clearCategory ? null : (selectedCategory ?? this.selectedCategory),
+      isShowingBookmarks: isShowingBookmarks ?? this.isShowingBookmarks,
     );
   }
 }
