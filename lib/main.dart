@@ -20,6 +20,7 @@ void main() async {
   await initializeDateFormatting('fa_IR', null);
 
   final db = await ObjectBoxStore.create();
+  await db.syncCategoriesFromJson('assets/news_category_link.json');
   final dio = Dio();
   final connectivity = Connectivity();
   final networkService = NetworkService(dio, connectivity);

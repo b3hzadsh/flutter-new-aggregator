@@ -45,6 +45,12 @@ class _CategoryDrawerState extends State<CategoryDrawer> {
             child: FutureBuilder<List<Category>>(
               future: _categoriesFuture,
               builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('خطا در بارگذاری دسته‌بندی‌ها: ${snapshot.error}', textAlign: TextAlign.center),
+                  );
+                }
+                
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -57,7 +63,7 @@ class _CategoryDrawerState extends State<CategoryDrawer> {
                       children: [
                         ListTile(
                           title: const Text('همه اخبار'),
-                          selected: state.selectedCategory == null && !state.isShowingBookmarks,
+                          selected: state.selectedCategoryId == null && !state.isShowingBookmarks,
                           onTap: () {
                             cubit.showBookmarksOnly(false);
                             cubit.selectCategory(null);
@@ -67,10 +73,10 @@ class _CategoryDrawerState extends State<CategoryDrawer> {
                         ...categories.map((category) => ListTile(
                               title: Text(category.name),
                               selected:
-                                  state.selectedCategory?.id == category.id && !state.isShowingBookmarks,
+                                  state.selectedCategoryId == category.remoteId && !state.isShowingBookmarks,
                               onTap: () {
                                 cubit.showBookmarksOnly(false);
-                                cubit.selectCategory(category);
+                                cubit.selectCategory(category.remoteId, categoryName: category.name);
                                 Navigator.pop(context);
                               },
                             )),

@@ -4,7 +4,7 @@ import 'package:news_aggregator/data/services/sync_service.dart';
 import 'package:news_aggregator/data/sources/rss_data_source.dart';
 import 'package:news_aggregator/domain/repositories/news_storage.dart';
 import 'package:news_aggregator/domain/entities/news_item.dart';
-import 'package:news_aggregator/domain/entities/category.dart';
+import 'package:news_aggregator/domain/entities/feed_source.dart';
 
 class MockRssDataSource extends Mock implements RssDataSource {}
 class MockNewsStorage extends Mock implements NewsStorage {}
@@ -18,12 +18,16 @@ void main() {
     mockStorage = MockNewsStorage();
     mockDataSource = MockRssDataSource();
     syncService = SyncService(mockDataSource, mockStorage);
+    
+    // Register fallback for DateTime
+    registerFallbackValue(DateTime.now());
   });
 
-  test('sync should fetch items and store new ones with category association', () async {
-    final category = Category(id: 1, name: 'Test', remoteUrl: 'url', source: 'test');
+  test('sync should cleanup old news, fetch items and store new ones with feed source association', () async {
+    final feed = FeedSource(id: 1, name: 'Test', url: 'url', isLocalOnly: false, language: 'fa');
     
-    when(() => mockStorage.getAllCategories()).thenAnswer((_) async => [category]);
+    when(() => mockStorage.deleteOldNews(any())).thenAnswer((_) async {});
+    when(() => mockStorage.getAllFeedSources()).thenAnswer((_) async => [feed]);
     when(() => mockStorage.getAllRemoteIds()).thenReturn({});
     when(() => mockStorage.insertMany(any())).thenAnswer((_) async {});
 
@@ -36,22 +40,24 @@ void main() {
       publishDate: DateTime.now(),
     );
 
-    when(() => mockDataSource.fetchFeed('url', 'test'))
+    when(() => mockDataSource.fetchFeed('url', 'Test'))
         .thenAnswer((_) async => [newItem]);
 
     await syncService.sync(true);
 
+    verify(() => mockStorage.deleteOldNews(any())).called(1);
     final captured = verify(() => mockStorage.insertMany(captureAny())).captured;
     final insertedItems = captured.first as List<NewsItem>;
     expect(insertedItems.length, 1);
     expect(insertedItems.first.remoteId, 'id1');
-    expect(insertedItems.first.category.target, category);
+    expect(insertedItems.first.feedSource.target, feed);
   });
 
   test('sync should avoid duplicates based on remoteId', () async {
-    final category = Category(id: 1, name: 'Test', remoteUrl: 'url', source: 'test');
+    final feed = FeedSource(id: 1, name: 'Test', url: 'url', isLocalOnly: false, language: 'fa');
     
-    when(() => mockStorage.getAllCategories()).thenAnswer((_) async => [category]);
+    when(() => mockStorage.deleteOldNews(any())).thenAnswer((_) async {});
+    when(() => mockStorage.getAllFeedSources()).thenAnswer((_) async => [feed]);
     when(() => mockStorage.getAllRemoteIds()).thenReturn({'id1'});
 
     final newItem = NewsItem(
@@ -63,7 +69,7 @@ void main() {
       publishDate: DateTime.now(),
     );
 
-    when(() => mockDataSource.fetchFeed('url', 'test'))
+    when(() => mockDataSource.fetchFeed('url', 'Test'))
         .thenAnswer((_) async => [newItem]);
 
     await syncService.sync(true);
@@ -71,11 +77,12 @@ void main() {
     verifyNever(() => mockStorage.insertMany(any()));
   });
 
-  test('sync should filter isLocalOnly categories if not Iranian IP', () async {
-    final catLocal = Category(id: 1, name: 'Local', remoteUrl: 'url_local', source: 'src', isLocalOnly: true);
-    final catGlobal = Category(id: 2, name: 'Global', remoteUrl: 'url_global', source: 'src', isLocalOnly: false);
+  test('sync should filter isLocalOnly feeds if not Iranian IP', () async {
+    final feedLocal = FeedSource(id: 1, name: 'Local', url: 'url_local', isLocalOnly: true, language: 'fa');
+    final feedGlobal = FeedSource(id: 2, name: 'Global', url: 'url_global', isLocalOnly: false, language: 'en');
     
-    when(() => mockStorage.getAllCategories()).thenAnswer((_) async => [catLocal, catGlobal]);
+    when(() => mockStorage.deleteOldNews(any())).thenAnswer((_) async {});
+    when(() => mockStorage.getAllFeedSources()).thenAnswer((_) async => [feedLocal, feedGlobal]);
     when(() => mockStorage.getAllRemoteIds()).thenReturn({});
     when(() => mockStorage.insertMany(any())).thenAnswer((_) async {});
 
@@ -88,7 +95,7 @@ void main() {
       publishDate: DateTime.now(),
     );
 
-    when(() => mockDataSource.fetchFeed('url_global', 'src'))
+    when(() => mockDataSource.fetchFeed('url_global', 'Global'))
         .thenAnswer((_) async => [itemGlobal]);
 
     await syncService.sync(false);
@@ -98,14 +105,15 @@ void main() {
     expect(insertedItems.length, 1);
     expect(insertedItems.first.title, 'Global Title');
     
-    verify(() => mockDataSource.fetchFeed('url_global', 'src')).called(1);
-    verifyNever(() => mockDataSource.fetchFeed('url_local', 'src'));
+    verify(() => mockDataSource.fetchFeed('url_global', 'Global')).called(1);
+    verifyNever(() => mockDataSource.fetchFeed('url_local', any()));
   });
 
-  test('sync should NOT filter isLocalOnly categories if Iranian IP', () async {
-    final catLocal = Category(id: 1, name: 'Local', remoteUrl: 'url_local', source: 'src', isLocalOnly: true);
+  test('sync should NOT filter isLocalOnly feeds if Iranian IP', () async {
+    final feedLocal = FeedSource(id: 1, name: 'Local', url: 'url_local', isLocalOnly: true, language: 'fa');
     
-    when(() => mockStorage.getAllCategories()).thenAnswer((_) async => [catLocal]);
+    when(() => mockStorage.deleteOldNews(any())).thenAnswer((_) async {});
+    when(() => mockStorage.getAllFeedSources()).thenAnswer((_) async => [feedLocal]);
     when(() => mockStorage.getAllRemoteIds()).thenReturn({});
     when(() => mockStorage.insertMany(any())).thenAnswer((_) async {});
 
@@ -118,12 +126,12 @@ void main() {
       publishDate: DateTime.now(),
     );
 
-    when(() => mockDataSource.fetchFeed('url_local', 'src'))
+    when(() => mockDataSource.fetchFeed('url_local', 'Local'))
         .thenAnswer((_) async => [itemLocal]);
 
     await syncService.sync(true);
 
-    verify(() => mockDataSource.fetchFeed('url_local', 'src')).called(1);
+    verify(() => mockDataSource.fetchFeed('url_local', 'Local')).called(1);
     verify(() => mockStorage.insertMany(any())).called(1);
   });
 }

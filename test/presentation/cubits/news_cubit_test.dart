@@ -40,7 +40,7 @@ void main() {
 
   test('initial state has empty list', () {
     expect(cubit.state.items, isEmpty);
-    expect(cubit.state.selectedCategory, isNull);
+    expect(cubit.state.selectedCategoryId, isNull);
   });
 
   test('emits news items when database changes (all items)', () async {
@@ -63,7 +63,7 @@ void main() {
   });
 
   test('filters items by category', () async {
-    final category1 = Category(id: 1, name: 'Tech', remoteUrl: 'url1', source: 'source1');
+    final category1 = Category(id: 1, remoteId: 'tech', name: 'Tech');
     
     final item1 = NewsItem(
       remoteId: '1',
@@ -78,10 +78,10 @@ void main() {
     verify(() => mockStorage.watchAllItems()).called(1);
 
     // Select category
-    cubit.selectCategory(category1);
+    cubit.selectCategory(category1.remoteId);
     
-    expect(cubit.state.selectedCategory, category1);
-    verify(() => mockStorage.watchItemsByCategory(1)).called(1);
+    expect(cubit.state.selectedCategoryId, category1.remoteId);
+    verify(() => mockStorage.watchItemsByCategory('tech')).called(1);
 
     categoryItemsController.add([item1]);
     await Future.delayed(Duration.zero);
@@ -91,7 +91,7 @@ void main() {
 
     // Deselect category
     cubit.selectCategory(null);
-    expect(cubit.state.selectedCategory, isNull);
+    expect(cubit.state.selectedCategoryId, isNull);
     verify(() => mockStorage.watchAllItems()).called(1); // Second call
   });
 

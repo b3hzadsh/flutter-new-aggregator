@@ -13,35 +13,40 @@ class SyncService {
   );
 
   Future<void> sync(bool isIranianIp) async {
-    final allCategories = await db.getAllCategories();
-    final categories = allCategories.where((c) {
-      if (c.isLocalOnly && !isIranianIp) return false;
+    // 1. Cleanup old news
+    final cutoff = DateTime.now().subtract(const Duration(days: 30));
+    await db.deleteOldNews(cutoff);
+
+    // 2. Fetch all feed sources
+    final allFeeds = await db.getAllFeedSources();
+    final activeFeeds = allFeeds.where((f) {
+      if (f.isLocalOnly && !isIranianIp) return false;
       return true;
     }).toList();
 
-    if (categories.isEmpty) return;
+    if (activeFeeds.isEmpty) return;
 
     final List<NewsItem> allNewItems = [];
     final existingRemoteIds = db.getAllRemoteIds();
 
-    for (final category in categories) {
+    for (final feed in activeFeeds) {
       try {
-        final items = await dataSource.fetchFeed(category.remoteUrl, category.source);
+        final items = await dataSource.fetchFeed(feed.url, feed.name);
         
         for (final item in items) {
-          if (!existingRemoteIds.contains(item.remoteId)) {
-            item.category.target = category;
+          if (existingRemoteIds.add(item.remoteId)) {
+            item.feedSource.target = feed;
             allNewItems.add(item);
           }
         }
       } catch (e) {
-        debugPrint('Error fetching feed for ${category.name}: $e');
+        debugPrint('Error fetching feed for ${feed.name}: $e');
       }
     }
 
     if (allNewItems.isNotEmpty) {
       await db.insertMany(allNewItems);
-      debugPrint('Synced ${allNewItems.length} new items across ${categories.length} categories');
+      debugPrint('Synced ${allNewItems.length} new items across ${activeFeeds.length} feeds');
     }
   }
 }

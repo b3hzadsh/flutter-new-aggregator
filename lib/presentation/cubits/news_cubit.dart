@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 import '../../domain/entities/news_item.dart';
-import '../../domain/entities/category.dart';
 import '../../domain/repositories/news_storage.dart';
 import '../../data/services/sync_service.dart';
 import '../../data/services/network_service.dart';
@@ -10,14 +9,16 @@ class NewsState {
   final List<NewsItem> items;
   final bool isLoading;
   final String? error;
-  final Category? selectedCategory;
+  final String? selectedCategoryId;
+  final String? selectedCategoryName;
   final bool isShowingBookmarks;
 
   NewsState({
     required this.items,
     this.isLoading = false,
     this.error,
-    this.selectedCategory,
+    this.selectedCategoryId,
+    this.selectedCategoryName,
     this.isShowingBookmarks = false,
   });
 
@@ -25,7 +26,8 @@ class NewsState {
     List<NewsItem>? items,
     bool? isLoading,
     String? error,
-    Category? selectedCategory,
+    String? selectedCategoryId,
+    String? selectedCategoryName,
     bool clearCategory = false,
     bool? isShowingBookmarks,
   }) {
@@ -33,7 +35,8 @@ class NewsState {
       items: items ?? this.items,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
-      selectedCategory: clearCategory ? null : (selectedCategory ?? this.selectedCategory),
+      selectedCategoryId: clearCategory ? null : (selectedCategoryId ?? this.selectedCategoryId),
+      selectedCategoryName: clearCategory ? null : (selectedCategoryName ?? this.selectedCategoryName),
       isShowingBookmarks: isShowingBookmarks ?? this.isShowingBookmarks,
     );
   }
@@ -55,8 +58,8 @@ class NewsCubit extends Cubit<NewsState> {
     final Stream<List<NewsItem>> stream;
     if (state.isShowingBookmarks) {
       stream = db.watchBookmarks();
-    } else if (state.selectedCategory != null) {
-      stream = db.watchItemsByCategory(state.selectedCategory!.id);
+    } else if (state.selectedCategoryId != null) {
+      stream = db.watchItemsByCategory(state.selectedCategoryId!);
     } else {
       stream = db.watchAllItems();
     }
@@ -66,11 +69,11 @@ class NewsCubit extends Cubit<NewsState> {
     });
   }
 
-  void selectCategory(Category? category) {
-    if (category == null) {
+  void selectCategory(String? categoryRemoteId, {String? categoryName}) {
+    if (categoryRemoteId == null) {
       emit(state.copyWith(clearCategory: true));
     } else {
-      emit(state.copyWith(selectedCategory: category));
+      emit(state.copyWith(selectedCategoryId: categoryRemoteId, selectedCategoryName: categoryName));
     }
     _subscribe();
   }

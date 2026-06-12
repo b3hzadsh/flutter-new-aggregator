@@ -39,8 +39,8 @@ void main() {
 
   testWidgets('CategoryDrawer displays categories and handles selection', (WidgetTester tester) async {
     final categories = [
-      Category(id: 1, name: 'سیاسی', remoteUrl: '', source: ''),
-      Category(id: 2, name: 'ورزشی', remoteUrl: '', source: ''),
+      Category(id: 1, remoteId: 'political', name: 'سیاسی'),
+      Category(id: 2, remoteId: 'sports', name: 'ورزشی'),
     ];
 
     when(() => mockStorage.getAllCategories()).thenAnswer((_) async => categories);
@@ -77,7 +77,7 @@ void main() {
     // Test selection
     await tester.tap(find.text('سیاسی'));
     verify(() => mockCubit.showBookmarksOnly(false)).called(1);
-    verify(() => mockCubit.selectCategory(categories[0])).called(1);
+    verify(() => mockCubit.selectCategory(categories[0].remoteId, categoryName: categories[0].name)).called(1);
     
     // Drawer should be closed after selection (due to Navigator.pop)
     await tester.pumpAndSettle();

@@ -66,7 +66,7 @@ class _NewsListPageState extends State<NewsListPage> {
                   title: Text(
                     state.isShowingBookmarks
                         ? 'اخبار ذخیره شده'
-                        : (state.selectedCategory?.name ?? 'تازه‌ترین اخبار'),
+                        : (state.selectedCategoryName ?? 'تازه‌ترین اخبار'),
                   ),
                   actions: [
                     BlocBuilder<ThemeCubit, ThemeMode>(

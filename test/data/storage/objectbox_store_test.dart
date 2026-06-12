@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:news_aggregator/data/storage/objectbox_store.dart';
 import 'package:news_aggregator/objectbox.g.dart';
 import 'package:news_aggregator/domain/entities/news_item.dart';
+import 'package:news_aggregator/domain/entities/category.dart';
+import 'package:news_aggregator/domain/entities/feed_source.dart';
 
 void main() {
   late Store store;
@@ -28,18 +30,16 @@ void main() {
     expect(objectBoxStore.newsBox, isNotNull);
   });
 
-  test('ObjectBoxStore should seed categories if empty', () async {
-    final objectBoxStore = ObjectBoxStore.fromStore(store);
-    final categories = await objectBoxStore.getAllCategories();
-    expect(categories, hasLength(4));
-    expect(categories.any((c) => c.name == 'ISNA'), isTrue);
-  });
-
   test('watchItemsByCategory should return items for specific category',
       () async {
     final objectBoxStore = ObjectBoxStore.fromStore(store);
-    final categories = await objectBoxStore.getAllCategories();
-    final category = categories.first;
+    
+    final category = Category(remoteId: 'cat1', name: 'Category 1');
+    objectBoxStore.categoryBox.put(category);
+
+    final feed = FeedSource(name: 'Feed 1', url: 'url1', language: 'fa');
+    feed.category.target = category;
+    objectBoxStore.feedSourceBox.put(feed);
 
     final item = NewsItem(
       remoteId: '1',
@@ -49,10 +49,10 @@ void main() {
       sourceName: 'Source',
       publishDate: DateTime.now(),
     );
-    item.category.target = category;
+    item.feedSource.target = feed;
     await objectBoxStore.insertMany([item]);
 
-    final stream = objectBoxStore.watchItemsByCategory(category.id);
+    final stream = objectBoxStore.watchItemsByCategory(category.remoteId);
     final results = await stream.first;
     expect(results, hasLength(1));
     expect(results.first.remoteId, '1');
@@ -77,7 +77,6 @@ void main() {
     await objectBoxStore.clearAllNews();
 
     expect(objectBoxStore.getAll(), isEmpty);
-    expect(await objectBoxStore.getAllCategories(), isNotEmpty);
   });
 
   test('updateNewsStatus should update isRead and isBookmarked', () async {
@@ -135,5 +134,29 @@ void main() {
     final results = await stream.first;
     expect(results, hasLength(1));
     expect(results.first.remoteId, '1');
+  });
+
+  test('syncCategoriesFromJson should correctly import from news_category_link.json', () async {
+    final objectBoxStore = ObjectBoxStore.fromStore(store);
+    
+    // We'll use the actual file in the root directory for this test
+    final jsonPath = 'news_category_link.json';
+    
+    await objectBoxStore.syncCategoriesFromJson(jsonPath);
+    
+    final categories = await objectBoxStore.getAllCategories();
+    expect(categories, isNotEmpty);
+    
+    // Check for a specific category from the JSON
+    final generalNews = categories.firstWhere((c) => c.remoteId == 'general_news');
+    expect(generalNews.name, 'خبرهای عمومی');
+    
+    final feeds = await objectBoxStore.getAllFeedSources();
+    expect(feeds, isNotEmpty);
+    
+    // Check for a specific feed
+    final farsFeed = feeds.firstWhere((f) => f.url == 'https://www.farsnews.ir/rss');
+    expect(farsFeed.name, 'خبرگزاری فارس');
+    expect(farsFeed.category.target?.remoteId, 'general_news');
   });
 }

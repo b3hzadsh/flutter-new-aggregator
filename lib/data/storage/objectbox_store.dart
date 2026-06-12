@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:flutter/foundation.dart' hide Category;
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../../objectbox.g.dart';
@@ -64,45 +65,51 @@ class ObjectBoxStore implements NewsStorage {
 
   @override
   Future<void> syncCategoriesFromJson(String jsonPath) async {
-    final file = File(jsonPath);
-    if (!await file.exists()) return;
+    try {
+      final jsonString = await rootBundle.loadString(jsonPath);
+      final data = json.decode(jsonString);
+      final categoriesMap = data['categories'] as Map<String, dynamic>;
 
-    final data = json.decode(await file.readAsString());
-    final categoriesMap = data['categories'] as Map<String, dynamic>;
-
-    for (final entry in categoriesMap.entries) {
-      final catData = entry.value;
-      final category = Category(
-        remoteId: catData['id'],
-        name: catData['name'],
-      );
-
-      // Upsert category
-      final existingCat = categoryBox
-          .query(Category_.remoteId.equals(category.remoteId))
-          .build()
-          .findFirst();
-      if (existingCat != null) category.id = existingCat.id;
-      categoryBox.put(category);
-
-      final feedsData = catData['feeds'] as List;
-      for (final feedData in feedsData) {
-        final feed = FeedSource(
-          name: feedData['name'],
-          url: feedData['url'],
-          language: feedData['language'],
-          isLocalOnly: feedData['region'] == 'ایران',
+      for (final entry in categoriesMap.entries) {
+        final catData = entry.value;
+        final category = Category(
+          remoteId: catData['id'],
+          name: catData['name'],
         );
-        feed.category.target = category;
 
-        // Upsert feed
-        final existingFeed = feedSourceBox
-            .query(FeedSource_.url.equals(feed.url))
-            .build()
-            .findFirst();
-        if (existingFeed != null) feed.id = existingFeed.id;
-        feedSourceBox.put(feed);
+        // Upsert category
+        final catQuery = categoryBox
+            .query(Category_.remoteId.equals(category.remoteId))
+            .build();
+        final existingCat = catQuery.findFirst();
+        catQuery.close();
+        
+        if (existingCat != null) category.id = existingCat.id;
+        categoryBox.put(category);
+
+        final feedsData = catData['feeds'] as List;
+        for (final feedData in feedsData) {
+          final feed = FeedSource(
+            name: feedData['name'],
+            url: feedData['url'],
+            language: feedData['language'],
+            isLocalOnly: feedData['region'] == 'ایران',
+          );
+          feed.category.target = category;
+
+          // Upsert feed
+          final feedQuery = feedSourceBox
+              .query(FeedSource_.url.equals(feed.url))
+              .build();
+          final existingFeed = feedQuery.findFirst();
+          feedQuery.close();
+          
+          if (existingFeed != null) feed.id = existingFeed.id;
+          feedSourceBox.put(feed);
+        }
       }
+    } catch (e) {
+      debugPrint('Error syncing categories from JSON: $e');
     }
   }
 
