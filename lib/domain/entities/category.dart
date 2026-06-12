@@ -1,24 +1,23 @@
 import 'package:objectbox/objectbox.dart';
+import 'feed_source.dart';
 
 @Entity()
 class Category {
   @Id()
   int id = 0;
 
+  @Unique()
+  final String remoteId;
+
   @Index()
   final String name;
-  
-  @Unique()
-  final String remoteUrl;
-  
-  final String source;
-  bool isLocalOnly;
+
+  @Backlink('category')
+  final feeds = ToMany<FeedSource>();
 
   Category({
     this.id = 0,
+    required this.remoteId,
     required this.name,
-    required this.remoteUrl,
-    required this.source,
-    this.isLocalOnly = false,
   });
 }

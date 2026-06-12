@@ -1,12 +1,12 @@
 import 'package:objectbox/objectbox.dart';
-import 'category.dart';
+import 'feed_source.dart';
 
 @Entity()
 class NewsItem {
   @Id()
   int id = 0;
 
-  final category = ToOne<Category>();
+  final feedSource = ToOne<FeedSource>();
 
   @Index(type: IndexType.hash)
   final String remoteId;

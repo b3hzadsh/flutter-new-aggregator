@@ -15,6 +15,7 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'domain/entities/category.dart';
+import 'domain/entities/feed_source.dart';
 import 'domain/entities/news_item.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -23,7 +24,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 1836617437630631139),
     name: 'NewsItem',
-    lastPropertyId: const obx_int.IdUid(12, 2201504685307884630),
+    lastPropertyId: const obx_int.IdUid(13, 4753991589717073638),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -90,19 +91,19 @@ final _entities = <obx_int.ModelEntity>[
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(11, 7115271584127297927),
-        name: 'categoryId',
-        type: 11,
-        flags: 520,
-        indexId: const obx_int.IdUid(6, 4344473782344540753),
-        relationField: 'category',
-        relationTarget: 'Category',
-      ),
-      obx_int.ModelProperty(
         id: const obx_int.IdUid(12, 2201504685307884630),
         name: 'isBookmarked',
         type: 1,
         flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(13, 4753991589717073638),
+        name: 'feedSourceId',
+        type: 11,
+        flags: 520,
+        indexId: const obx_int.IdUid(11, 8043770954655030617),
+        relationField: 'feedSource',
+        relationTarget: 'FeedSource',
       ),
     ],
     relations: <obx_int.ModelRelation>[],
@@ -111,7 +112,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 6492590044570806792),
     name: 'Category',
-    lastPropertyId: const obx_int.IdUid(5, 632269168761744043),
+    lastPropertyId: const obx_int.IdUid(6, 1924350965443868698),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -128,23 +129,68 @@ final _entities = <obx_int.ModelEntity>[
         indexId: const obx_int.IdUid(4, 3884175598625506349),
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(3, 1367047334910722210),
-        name: 'remoteUrl',
+        id: const obx_int.IdUid(6, 1924350965443868698),
+        name: 'remoteId',
         type: 9,
         flags: 2080,
-        indexId: const obx_int.IdUid(5, 680063547437429529),
+        indexId: const obx_int.IdUid(7, 5207263346692712083),
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[
+      obx_int.ModelBacklink(
+        name: 'feeds',
+        srcEntity: 'FeedSource',
+        srcField: 'category',
+      ),
+    ],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(3, 3099189070807932972),
+    name: 'FeedSource',
+    lastPropertyId: const obx_int.IdUid(6, 301907956351643651),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 5914698160574790799),
+        name: 'id',
+        type: 6,
+        flags: 1,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(4, 2760860092243372791),
-        name: 'source',
+        id: const obx_int.IdUid(2, 1260894487214873533),
+        name: 'name',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(8, 7058156082708696718),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 7551726413232562976),
+        name: 'url',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(9, 7896362547206206769),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 7631655664973332245),
+        name: 'language',
         type: 9,
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(5, 632269168761744043),
+        id: const obx_int.IdUid(5, 5120055145436160056),
         name: 'isLocalOnly',
         type: 1,
         flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 301907956351643651),
+        name: 'categoryId',
+        type: 11,
+        flags: 520,
+        indexId: const obx_int.IdUid(10, 7943891374865082803),
+        relationField: 'category',
+        relationTarget: 'Category',
       ),
     ],
     relations: <obx_int.ModelRelation>[],
@@ -195,13 +241,18 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(2, 6492590044570806792),
-    lastIndexId: const obx_int.IdUid(6, 4344473782344540753),
+    lastEntityId: const obx_int.IdUid(3, 3099189070807932972),
+    lastIndexId: const obx_int.IdUid(11, 8043770954655030617),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
-    retiredIndexUids: const [],
-    retiredPropertyUids: const [],
+    retiredIndexUids: const [680063547437429529, 4344473782344540753],
+    retiredPropertyUids: const [
+      1367047334910722210,
+      2760860092243372791,
+      632269168761744043,
+      7115271584127297927,
+    ],
     retiredRelationUids: const [],
     modelVersion: 5,
     modelVersionParserMinimum: 5,
@@ -211,7 +262,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
   final bindings = <Type, obx_int.EntityDefinition>{
     NewsItem: obx_int.EntityDefinition<NewsItem>(
       model: _entities[0],
-      toOneRelations: (NewsItem object) => [object.category],
+      toOneRelations: (NewsItem object) => [object.feedSource],
       toManyRelations: (NewsItem object) => {},
       getId: (NewsItem object) => object.id,
       setId: (NewsItem object, int id) {
@@ -226,7 +277,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ? null
             : fbb.writeString(object.imageUrl!);
         final sourceNameOffset = fbb.writeString(object.sourceName);
-        fbb.startTable(13);
+        fbb.startTable(14);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, remoteIdOffset);
         fbb.addOffset(2, titleOffset);
@@ -237,8 +288,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(7, object.publishDate.millisecondsSinceEpoch);
         fbb.addBool(8, object.isRead);
         fbb.addBool(9, object.isPriority);
-        fbb.addInt64(10, object.category.targetId);
         fbb.addBool(11, object.isBookmarked);
+        fbb.addInt64(12, object.feedSource.targetId);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -303,34 +354,91 @@ obx_int.ModelDefinition getObjectBoxModel() {
           isPriority: isPriorityParam,
           isBookmarked: isBookmarkedParam,
         );
-        object.category.targetId = const fb.Int64Reader().vTableGet(
+        object.feedSource.targetId = const fb.Int64Reader().vTableGet(
           buffer,
           rootOffset,
-          24,
+          28,
           0,
         );
-        object.category.attach(store);
+        object.feedSource.attach(store);
         return object;
       },
     ),
     Category: obx_int.EntityDefinition<Category>(
       model: _entities[1],
       toOneRelations: (Category object) => [],
-      toManyRelations: (Category object) => {},
+      toManyRelations: (Category object) => {
+        obx_int.RelInfo<FeedSource>.toOneBacklink(
+          6,
+          object.id,
+          (FeedSource srcObject) => srcObject.category,
+        ): object.feeds,
+      },
       getId: (Category object) => object.id,
       setId: (Category object, int id) {
         object.id = id;
       },
       objectToFB: (Category object, fb.Builder fbb) {
         final nameOffset = fbb.writeString(object.name);
-        final remoteUrlOffset = fbb.writeString(object.remoteUrl);
-        final sourceOffset = fbb.writeString(object.source);
-        fbb.startTable(6);
+        final remoteIdOffset = fbb.writeString(object.remoteId);
+        fbb.startTable(7);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
-        fbb.addOffset(2, remoteUrlOffset);
-        fbb.addOffset(3, sourceOffset);
+        fbb.addOffset(5, remoteIdOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final remoteIdParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 14, '');
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final object = Category(
+          id: idParam,
+          remoteId: remoteIdParam,
+          name: nameParam,
+        );
+        obx_int.InternalToManyAccess.setRelInfo<Category>(
+          object.feeds,
+          store,
+          obx_int.RelInfo<FeedSource>.toOneBacklink(
+            6,
+            object.id,
+            (FeedSource srcObject) => srcObject.category,
+          ),
+        );
+        return object;
+      },
+    ),
+    FeedSource: obx_int.EntityDefinition<FeedSource>(
+      model: _entities[2],
+      toOneRelations: (FeedSource object) => [object.category],
+      toManyRelations: (FeedSource object) => {},
+      getId: (FeedSource object) => object.id,
+      setId: (FeedSource object, int id) {
+        object.id = id;
+      },
+      objectToFB: (FeedSource object, fb.Builder fbb) {
+        final nameOffset = fbb.writeString(object.name);
+        final urlOffset = fbb.writeString(object.url);
+        final languageOffset = fbb.writeString(object.language);
+        fbb.startTable(7);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, urlOffset);
+        fbb.addOffset(3, languageOffset);
         fbb.addBool(4, object.isLocalOnly);
+        fbb.addInt64(5, object.category.targetId);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -346,10 +454,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final nameParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 6, '');
-        final remoteUrlParam = const fb.StringReader(
+        final urlParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 8, '');
-        final sourceParam = const fb.StringReader(
+        final languageParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 10, '');
         final isLocalOnlyParam = const fb.BoolReader().vTableGet(
@@ -358,14 +466,20 @@ obx_int.ModelDefinition getObjectBoxModel() {
           12,
           false,
         );
-        final object = Category(
+        final object = FeedSource(
           id: idParam,
           name: nameParam,
-          remoteUrl: remoteUrlParam,
-          source: sourceParam,
+          url: urlParam,
+          language: languageParam,
           isLocalOnly: isLocalOnlyParam,
         );
-
+        object.category.targetId = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          0,
+        );
+        object.category.attach(store);
         return object;
       },
     ),
@@ -426,13 +540,13 @@ class NewsItem_ {
     _entities[0].properties[9],
   );
 
-  /// See [NewsItem.category].
-  static final category = obx.QueryRelationToOne<NewsItem, Category>(
+  /// See [NewsItem.isBookmarked].
+  static final isBookmarked = obx.QueryBooleanProperty<NewsItem>(
     _entities[0].properties[10],
   );
 
-  /// See [NewsItem.isBookmarked].
-  static final isBookmarked = obx.QueryBooleanProperty<NewsItem>(
+  /// See [NewsItem.feedSource].
+  static final feedSource = obx.QueryRelationToOne<NewsItem, FeedSource>(
     _entities[0].properties[11],
   );
 }
@@ -449,18 +563,46 @@ class Category_ {
     _entities[1].properties[1],
   );
 
-  /// See [Category.remoteUrl].
-  static final remoteUrl = obx.QueryStringProperty<Category>(
+  /// See [Category.remoteId].
+  static final remoteId = obx.QueryStringProperty<Category>(
     _entities[1].properties[2],
   );
 
-  /// See [Category.source].
-  static final source = obx.QueryStringProperty<Category>(
-    _entities[1].properties[3],
+  /// see [Category.feeds]
+  static final feeds = obx.QueryBacklinkToMany<FeedSource, Category>(
+    FeedSource_.category,
+  );
+}
+
+/// [FeedSource] entity fields to define ObjectBox queries.
+class FeedSource_ {
+  /// See [FeedSource.id].
+  static final id = obx.QueryIntegerProperty<FeedSource>(
+    _entities[2].properties[0],
   );
 
-  /// See [Category.isLocalOnly].
-  static final isLocalOnly = obx.QueryBooleanProperty<Category>(
-    _entities[1].properties[4],
+  /// See [FeedSource.name].
+  static final name = obx.QueryStringProperty<FeedSource>(
+    _entities[2].properties[1],
+  );
+
+  /// See [FeedSource.url].
+  static final url = obx.QueryStringProperty<FeedSource>(
+    _entities[2].properties[2],
+  );
+
+  /// See [FeedSource.language].
+  static final language = obx.QueryStringProperty<FeedSource>(
+    _entities[2].properties[3],
+  );
+
+  /// See [FeedSource.isLocalOnly].
+  static final isLocalOnly = obx.QueryBooleanProperty<FeedSource>(
+    _entities[2].properties[4],
+  );
+
+  /// See [FeedSource.category].
+  static final category = obx.QueryRelationToOne<FeedSource, Category>(
+    _entities[2].properties[5],
   );
 }
