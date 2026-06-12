@@ -1,9 +1,12 @@
 import 'package:objectbox/objectbox.dart';
+import 'category.dart';
 
 @Entity()
 class NewsItem {
   @Id()
   int id = 0;
+
+  final category = ToOne<Category>();
 
   @Index(type: IndexType.hash)
   final String remoteId;
