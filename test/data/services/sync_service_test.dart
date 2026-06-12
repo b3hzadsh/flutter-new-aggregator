@@ -5,6 +5,7 @@ import 'package:news_aggregator/data/services/sync_service.dart';
 import 'package:news_aggregator/data/sources/rss_data_source.dart';
 import 'package:news_aggregator/data/storage/objectbox_store.dart';
 import 'package:news_aggregator/domain/entities/news_item.dart';
+import 'package:news_aggregator/domain/entities/category.dart';
 import 'package:news_aggregator/objectbox.g.dart';
 
 class MockRssDataSource extends Mock implements RssDataSource {}
@@ -21,7 +22,7 @@ void main() {
     store = await openStore(directory: tempDir.path);
     db = ObjectBoxStore.fromStore(store);
     mockDataSource = MockRssDataSource();
-    syncService = SyncService(mockDataSource, db, feeds: {'test': 'url'});
+    syncService = SyncService(mockDataSource, db);
   });
 
   tearDown(() async {
@@ -31,7 +32,10 @@ void main() {
     }
   });
 
-  test('sync should fetch items and store new ones', () async {
+  test('sync should fetch items and store new ones with category association', () async {
+    final category = Category(name: 'Test', remoteUrl: 'url', source: 'test');
+    await db.seedCategories([category]);
+
     final newItem = NewsItem(
       remoteId: 'id1',
       title: 'Title 1',
@@ -41,7 +45,7 @@ void main() {
       publishDate: DateTime.now(),
     );
 
-    when(() => mockDataSource.fetchFeed(any(), any()))
+    when(() => mockDataSource.fetchFeed('url', 'test'))
         .thenAnswer((_) async => [newItem]);
 
     await syncService.sync();
@@ -49,9 +53,13 @@ void main() {
     expect(db.newsBox.count(), 1);
     final stored = db.newsBox.getAll().first;
     expect(stored.remoteId, 'id1');
+    expect(stored.category.target?.name, 'Test');
   });
 
   test('sync should avoid duplicates based on remoteId', () async {
+    final category = Category(name: 'Test', remoteUrl: 'url', source: 'test');
+    await db.seedCategories([category]);
+
     final existingItem = NewsItem(
       remoteId: 'id1',
       title: 'Old Title',
@@ -71,7 +79,7 @@ void main() {
       publishDate: DateTime.now(),
     );
 
-    when(() => mockDataSource.fetchFeed(any(), any()))
+    when(() => mockDataSource.fetchFeed('url', 'test'))
         .thenAnswer((_) async => [newItem]);
 
     await syncService.sync();
@@ -80,18 +88,17 @@ void main() {
     expect(db.newsBox.getAll().first.title, 'Old Title');
   });
 
-  test('sync should handle multiple feeds in parallel', () async {
-    syncService = SyncService(mockDataSource, db, feeds: {
-      'feed1': 'url1',
-      'feed2': 'url2',
-    });
+  test('sync should handle multiple categories', () async {
+    final cat1 = Category(name: 'Cat 1', remoteUrl: 'url1', source: 'src1');
+    final cat2 = Category(name: 'Cat 2', remoteUrl: 'url2', source: 'src2');
+    await db.seedCategories([cat1, cat2]);
 
     final item1 = NewsItem(
       remoteId: 'id1',
       title: 'Title 1',
       content: 'Content 1',
       summary: 'Summary 1',
-      sourceName: 'feed1',
+      sourceName: 'src1',
       publishDate: DateTime.now(),
     );
     final item2 = NewsItem(
@@ -99,17 +106,20 @@ void main() {
       title: 'Title 2',
       content: 'Content 2',
       summary: 'Summary 2',
-      sourceName: 'feed2',
+      sourceName: 'src2',
       publishDate: DateTime.now(),
     );
 
-    when(() => mockDataSource.fetchFeed('url1', 'feed1'))
+    when(() => mockDataSource.fetchFeed('url1', 'src1'))
         .thenAnswer((_) async => [item1]);
-    when(() => mockDataSource.fetchFeed('url2', 'feed2'))
+    when(() => mockDataSource.fetchFeed('url2', 'src2'))
         .thenAnswer((_) async => [item2]);
 
     await syncService.sync();
 
     expect(db.newsBox.count(), 2);
+    final storedItems = db.newsBox.getAll();
+    expect(storedItems.any((i) => i.category.target?.name == 'Cat 1'), true);
+    expect(storedItems.any((i) => i.category.target?.name == 'Cat 2'), true);
   });
 }
