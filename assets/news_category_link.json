@@ -17,18 +17,18 @@
       "name": "خبرهای عمومی",
       "description": "خبرگزاری‌های اصلی با پوشش گسترده موضوعات",
       "feeds": [
-        {
-          "id": "fars_general",
-          "name": "خبرگزاری فارس",
-          "url": "https://www.farsnews.ir/rss",
-          "description": "خبرگزاری رسمی با تمرکز بر اخبار سیاسی و امنیتی",
+         {
+          "id": "donya_e_eqtesad",
+          "name": "دنیای اقتصاد",
+          "url": "https://donya-e-eqtesad.com/feeds/",
+          "description": "تحلیل‌های عمیق اقتصادی و بازار سرمایه ایران",
           "language": "fa",
           "region": "ایران",
           "type": "rss",
           "update_frequency": "hourly",
-          "established": 1381,
+          "established": 1382,
           "reliability_score": 9,
-          "bias_rating": "محافظه‌کار"
+          "bias_rating": "مستقل"
         },
         {
           "id": "irna_general",
@@ -44,32 +44,6 @@
           "bias_rating": "دولتی"
         },
         {
-          "id": "ap_news",
-          "name": "Associated Press",
-          "url": "https://apnews.com/apf-topnews",
-          "description": "خبرگزاری مستقل آمریکایی با پوشش جهانی",
-          "language": "en",
-          "region": "آمریکا",
-          "type": "rss",
-          "update_frequency": "realtime",
-          "established": 1846,
-          "reliability_score": 10,
-          "bias_rating": "مستقل"
-        },
-        {
-          "id": "reuters_general",
-          "name": "Reuters",
-          "url": "https://feeds.reuters.com/reuters/topNews",
-          "description": "خبرگزاری بین‌المللی با تمرکز بر اخبار تجاری",
-          "language": "en",
-          "region": "بین‌الملل",
-          "type": "rss",
-          "update_frequency": "realtime",
-          "established": 1851,
-          "reliability_score": 10,
-          "bias_rating": "مستقل"
-        },
-        {
           "id": "bbc_world",
           "name": "BBC World News",
           "url": "https://feeds.bbci.co.uk/news/rss.xml",
@@ -80,19 +54,6 @@
           "update_frequency": "hourly",
           "established": 1922,
           "reliability_score": 9,
-          "bias_rating": "لیبرال"
-        },
-        {
-          "id": "cnn_world",
-          "name": "CNN World",
-          "url": "https://rss.cnn.com/rss/cnn_world.rss",
-          "description": "شبکه خبری آمریکایی با پوشش بین‌المللی",
-          "language": "en",
-          "region": "آمریکا",
-          "type": "rss",
-          "update_frequency": "realtime",
-          "established": 1980,
-          "reliability_score": 8,
           "bias_rating": "لیبرال"
         },
         {
@@ -116,32 +77,6 @@
       "name": "سیاسی",
       "description": "تحلیل‌ها و گزارش‌های تخصصی حوزه سیاست",
       "feeds": [
-        {
-          "id": "fars_politics",
-          "name": "فارس سیاسی",
-          "url": "https://www.farsnews.ir/rss/politics",
-          "description": "تحلیل‌های سیاسی و امنیتی با رویکرد محافظه‌کارانه",
-          "language": "fa",
-          "region": "ایران",
-          "type": "rss",
-          "update_frequency": "hourly",
-          "established": 1381,
-          "reliability_score": 9,
-          "bias_rating": "محافظه‌کار"
-        },
-        {
-          "id": "ap_politics",
-          "name": "AP Politics",
-          "url": "https://apnews.com/apf-politics",
-          "description": "پوشش سیاسی مستقل آمریکایی",
-          "language": "en",
-          "region": "آمریکا",
-          "type": "rss",
-          "update_frequency": "realtime",
-          "established": 1846,
-          "reliability_score": 10,
-          "bias_rating": "مستقل"
-        },
         {
           "id": "politico",
           "name": "Politico",
@@ -216,19 +151,6 @@
       "description": "اخبار بازار، بورس، اقتصاد کلان و امور مالی",
       "feeds": [
         {
-          "id": "reuters_business",
-          "name": "Reuters Business",
-          "url": "https://feeds.reuters.com/reuters/businessNews",
-          "description": "اخبار تجاری و مالی بین‌المللی",
-          "language": "en",
-          "region": "بین‌الملل",
-          "type": "rss",
-          "update_frequency": "realtime",
-          "established": 1851,
-          "reliability_score": 10,
-          "bias_rating": "مستقل"
-        },
-        {
           "id": "bloomberg",
           "name": "Bloomberg",
           "url": "https://www.bloomberg.com/feeds/podcasts/etf_report.xml",
@@ -279,32 +201,6 @@
           "established": 1989,
           "reliability_score": 8,
           "bias_rating": "میانه‌رو"
-        },
-        {
-          "id": "donya_e_eqtesad",
-          "name": "دنیای اقتصاد",
-          "url": "https://donya-e-eqtesad.com/rss",
-          "description": "تحلیل‌های عمیق اقتصادی و بازار سرمایه ایران",
-          "language": "fa",
-          "region": "ایران",
-          "type": "rss",
-          "update_frequency": "hourly",
-          "established": 1382,
-          "reliability_score": 9,
-          "bias_rating": "مستقل"
-        },
-        {
-          "id": "economist",
-          "name": "The Economist",
-          "url": "https://www.economist.com/rss",
-          "description": "تحلیل‌های اقتصادی و سیاسی جهانی",
-          "language": "en",
-          "region": "اروپا",
-          "type": "rss",
-          "update_frequency": "weekly",
-          "established": 1843,
-          "reliability_score": 9,
-          "bias_rating": "لیبرال"
         }
       ]
     },
@@ -442,7 +338,7 @@
         {
           "id": "varzesh3",
           "name": "ورزش سه",
-          "url": "https://www.varzesh3.com/rss",
+          "url": "https://www.varzesh3.com/rss/all",
           "description": "پرتخمین‌ترین سایت ورزشی ایران با تمرکز بر فوتبال",
           "language": "fa",
           "region": "ایران",
@@ -463,32 +359,6 @@
           "update_frequency": "realtime",
           "established": 1990,
           "reliability_score": 9,
-          "bias_rating": "مستقل"
-        },
-        {
-          "id": "nba_news",
-          "name": "NBA News",
-          "url": "https://www.nba.com/rss/nba_rss.xml",
-          "description": "اخبار رسمی ان‌بی‌ای",
-          "language": "en",
-          "region": "آمریکا",
-          "type": "rss",
-          "update_frequency": "daily",
-          "established": 1946,
-          "reliability_score": 10,
-          "bias_rating": "مستقل"
-        },
-        {
-          "id": "fifa_news",
-          "name": "FIFA News",
-          "url": "https://www.fifa.com/rss-feeds/news/rss.xml",
-          "description": "اخبار رسمی فیفا",
-          "language": "en",
-          "region": "بین‌الملل",
-          "type": "rss",
-          "update_frequency": "daily",
-          "established": 1904,
-          "reliability_score": 10,
           "bias_rating": "مستقل"
         }
       ]
@@ -528,7 +398,7 @@
         {
           "id": "nih_news",
           "name": "NIH News",
-          "url": "https://www.nih.gov/news-events/news-releases/rss",
+          "url": "https://www.nih.gov/news-releases/feed.xml",
           "description": "تازه‌های بهداشت و درمان از مؤسسه ملی سلامت آمریکا",
           "language": "en",
           "region": "آمریکا",
@@ -552,22 +422,9 @@
           "bias_rating": "مستقل"
         },
         {
-          "id": "scientific_american",
-          "name": "Scientific American",
-          "url": "https://www.scientificamerican.com/rss/",
-          "description": "مقالات علمی برای عموم",
-          "language": "en",
-          "region": "آمریکا",
-          "type": "rss",
-          "update_frequency": "weekly",
-          "established": 1845,
-          "reliability_score": 9,
-          "bias_rating": "مستقل"
-        },
-        {
           "id": "isna_science",
           "name": "ایسنا علمی",
-          "url": "https://www.isna.ir/rss/12",
+          "url": "https://www.isna.ir/rss/tp/5",
           "description": "اخبار علمی و دانشگاهی ایران",
           "language": "fa",
           "region": "ایران",
@@ -636,19 +493,6 @@
           "established": 1932,
           "reliability_score": 9,
           "bias_rating": "لیبرال"
-        },
-        {
-          "id": "ap_international",
-          "name": "AP International",
-          "url": "https://apnews.com/apf-intlnews",
-          "description": "اخبار بین‌المللی از آسوشیتدپرس",
-          "language": "en",
-          "region": "آمریکا",
-          "type": "rss",
-          "update_frequency": "realtime",
-          "established": 1846,
-          "reliability_score": 10,
-          "bias_rating": "مستقل"
         }
       ]
     },
