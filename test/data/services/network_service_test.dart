@@ -5,6 +5,7 @@ import 'package:news_aggregator/data/services/network_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class MockDio extends Mock implements Dio {}
+
 class MockConnectivity extends Mock implements Connectivity {}
 
 void main() {
@@ -31,7 +32,7 @@ void main() {
       final result = await networkService.isIranianIp();
 
       expect(result, isTrue);
-      verify(() => mockDio.get('http://ip-api.com/json')).called(1);
+      verify(() => mockDio.get('https://ip-api.com/json')).called(1);
     });
 
     test('returns false when countryCode is not IR', () async {
@@ -49,7 +50,9 @@ void main() {
     });
 
     test('returns false when request fails', () async {
-      when(() => mockDio.get(any())).thenThrow(DioException(requestOptions: RequestOptions(path: '')));
+      when(
+        () => mockDio.get(any()),
+      ).thenThrow(DioException(requestOptions: RequestOptions(path: '')));
 
       final result = await networkService.isIranianIp();
 
@@ -59,7 +62,9 @@ void main() {
 
   group('hasInternet', () {
     test('returns true when connected to wifi', () async {
-      when(() => mockConnectivity.checkConnectivity()).thenAnswer((_) async => [ConnectivityResult.wifi]);
+      when(
+        () => mockConnectivity.checkConnectivity(),
+      ).thenAnswer((_) async => [ConnectivityResult.wifi]);
 
       final result = await networkService.hasInternet();
 
@@ -67,7 +72,9 @@ void main() {
     });
 
     test('returns false when no connection', () async {
-      when(() => mockConnectivity.checkConnectivity()).thenAnswer((_) async => [ConnectivityResult.none]);
+      when(
+        () => mockConnectivity.checkConnectivity(),
+      ).thenAnswer((_) async => [ConnectivityResult.none]);
 
       final result = await networkService.hasInternet();
 

@@ -9,7 +9,7 @@ class NetworkService {
 
   Future<bool> isIranianIp() async {
     try {
-      final response = await dio.get('http://ip-api.com/json');
+      final response = await dio.get('https://ip-api.com/json');
       return response.data['countryCode'] == 'IR';
     } catch (_) {
       return false;
