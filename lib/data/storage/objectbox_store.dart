@@ -11,8 +11,8 @@ class ObjectBoxStore implements NewsStorage {
   final Box<Category> categoryBox;
 
   ObjectBoxStore.fromStore(this.store)
-      : newsBox = Box<NewsItem>(store),
-        categoryBox = Box<Category>(store) {
+    : newsBox = Box<NewsItem>(store),
+      categoryBox = Box<Category>(store) {
     _seedIfEmpty();
   }
 
@@ -74,7 +74,11 @@ class ObjectBoxStore implements NewsStorage {
   }
 
   @override
-  Future<void> updateNewsStatus(int id, {bool? isRead, bool? isBookmarked}) async {
+  Future<void> updateNewsStatus(
+    int id, {
+    bool? isRead,
+    bool? isBookmarked,
+  }) async {
     final item = newsBox.get(id);
     if (item != null) {
       if (isRead != null) item.isRead = isRead;
@@ -96,17 +100,25 @@ class ObjectBoxStore implements NewsStorage {
     if (categoryBox.isEmpty()) {
       final defaults = [
         Category(
-            name: 'ISNA', remoteUrl: 'https://www.isna.ir/rss', source: 'ISNA'),
+          name: 'ISNA',
+          remoteUrl: 'https://www.isna.ir/rss',
+          source: 'ISNA',
+        ),
         Category(
-            name: 'Mehr',
-            remoteUrl: 'https://www.mehrnews.com/rss',
-            source: 'Mehr'),
+          name: 'Mehr',
+          remoteUrl: 'https://www.mehrnews.com/rss',
+          source: 'Mehr',
+        ),
         Category(
-            name: 'IRNA', remoteUrl: 'https://www.irna.ir/rss', source: 'IRNA'),
+          name: 'IRNA',
+          remoteUrl: 'https://www.irna.ir/rss',
+          source: 'IRNA',
+        ),
         Category(
-            name: 'Tasnim',
-            remoteUrl: 'https://www.tasnimnews.com/fa/rss/feed/0/7/1/',
-            source: 'Tasnim'),
+          name: 'Tasnim',
+          remoteUrl: 'https://www.tasnimnews.com/fa/rss/feed/0/7/1/',
+          source: 'Tasnim',
+        ),
       ];
       categoryBox.putMany(defaults);
     }

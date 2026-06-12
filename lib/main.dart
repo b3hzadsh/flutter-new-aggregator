@@ -27,12 +27,14 @@ void main() async {
   final syncService = SyncService(rssDataSource, db);
   final prefs = await SharedPreferences.getInstance();
 
-  runApp(MyApp(
-    db: db,
-    syncService: syncService,
-    networkService: networkService,
-    prefs: prefs,
-  ));
+  runApp(
+    MyApp(
+      db: db,
+      syncService: syncService,
+      networkService: networkService,
+      prefs: prefs,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -60,7 +62,9 @@ class MyApp extends StatelessWidget {
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => NewsCubit(db, syncService, networkService)),
+          BlocProvider(
+            create: (context) => NewsCubit(db, syncService, networkService),
+          ),
           BlocProvider(create: (context) => ThemeCubit(prefs)),
         ],
         child: BlocBuilder<ThemeCubit, ThemeMode>(
@@ -76,9 +80,7 @@ class MyApp extends StatelessWidget {
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
-              supportedLocales: const [
-                Locale('fa', 'IR'),
-              ],
+              supportedLocales: const [Locale('fa', 'IR')],
               locale: const Locale('fa', 'IR'),
               home: const NewsListPage(),
             );

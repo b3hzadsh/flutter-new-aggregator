@@ -1,0 +1,757 @@
+{
+  "metadata": {
+    "title": "فیدهای RSS خبری جامع - فارسی و انگلیسی",
+    "description": "مجموعه‌ای کامل از فیدهای RSS خبرگزاری‌های معتبر جهانی به زبان‌های فارسی و انگلیسی، دسته‌بندی شده بر اساس موضوع و جغرافیا",
+    "version": "3.0.0",
+    "generated_date": "1405/03/22",
+    "languages": ["fa", "en"],
+    "regions": ["ایران", "آمریکا", "اروپا", "بین‌الملل"],
+    "encoding": "UTF-8",
+    "license": "CC BY 4.0",
+    "schema": "https://json-schema.org/draft/2020-12/schema"
+  },
+  
+  "categories": {
+    "general_news": {
+      "id": "general_news",
+      "name": "خبرهای عمومی",
+      "description": "خبرگزاری‌های اصلی با پوشش گسترده موضوعات",
+      "feeds": [
+        {
+          "id": "fars_general",
+          "name": "خبرگزاری فارس",
+          "url": "https://www.farsnews.ir/rss",
+          "description": "خبرگزاری رسمی با تمرکز بر اخبار سیاسی و امنیتی",
+          "language": "fa",
+          "region": "ایران",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1381,
+          "reliability_score": 9,
+          "bias_rating": "محافظه‌کار"
+        },
+        {
+          "id": "irna_general",
+          "name": "خبرگزاری جمهوری اسلامی ایران (ایرنا)",
+          "url": "https://www.irna.ir/rss",
+          "description": "خبرگزاری رسمی دولت با اخبار سراسری",
+          "language": "fa",
+          "region": "ایران",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1357,
+          "reliability_score": 9,
+          "bias_rating": "دولتی"
+        },
+        {
+          "id": "ap_news",
+          "name": "Associated Press",
+          "url": "https://apnews.com/apf-topnews",
+          "description": "خبرگزاری مستقل آمریکایی با پوشش جهانی",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1846,
+          "reliability_score": 10,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "reuters_general",
+          "name": "Reuters",
+          "url": "http://feeds.reuters.com/reuters/topNews",
+          "description": "خبرگزاری بین‌المللی با تمرکز بر اخبار تجاری",
+          "language": "en",
+          "region": "بین‌الملل",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1851,
+          "reliability_score": 10,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "bbc_world",
+          "name": "BBC World News",
+          "url": "http://feeds.bbci.co.uk/news/rss.xml",
+          "description": "خبرگزاری عمومی بریتانیایی با پوشش جهانی",
+          "language": "en",
+          "region": "اروپا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1922,
+          "reliability_score": 9,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "cnn_world",
+          "name": "CNN World",
+          "url": "http://rss.cnn.com/rss/cnn_world.rss",
+          "description": "شبکه خبری آمریکایی با پوشش بین‌المللی",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1980,
+          "reliability_score": 8,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "al_jazeera_english",
+          "name": "Al Jazeera English",
+          "url": "https://www.aljazeera.com/xml/rss/all.xml",
+          "description": "شبکه خبری قطر با تمرکز بر خاورمیانه",
+          "language": "en",
+          "region": "خاورمیانه",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1996,
+          "reliability_score": 8,
+          "bias_rating": "میانه‌رو"
+        }
+      ]
+    },
+    
+    "politics": {
+      "id": "politics",
+      "name": "سیاسی",
+      "description": "تحلیل‌ها و گزارش‌های تخصصی حوزه سیاست",
+      "feeds": [
+        {
+          "id": "fars_politics",
+          "name": "فارس سیاسی",
+          "url": "https://www.farsnews.ir/rss/politics",
+          "description": "تحلیل‌های سیاسی و امنیتی با رویکرد محافظه‌کارانه",
+          "language": "fa",
+          "region": "ایران",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1381,
+          "reliability_score": 9,
+          "bias_rating": "محافظه‌کار"
+        },
+        {
+          "id": "ap_politics",
+          "name": "AP Politics",
+          "url": "https://apnews.com/apf-politics",
+          "description": "پوشش سیاسی مستقل آمریکایی",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1846,
+          "reliability_score": 10,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "politico",
+          "name": "Politico",
+          "url": "https://www.politico.com/rss/politicopicks.xml",
+          "description": "تخصصی سیاست آمریکا و واشنگتن",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 2007,
+          "reliability_score": 8,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "the_hill",
+          "name": "The Hill",
+          "url": "https://thehill.com/news/feed/",
+          "description": "اخبار کنگره و سیاست واشنگتن",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1994,
+          "reliability_score": 8,
+          "bias_rating": "میانه‌رو"
+        },
+        {
+          "id": "bbc_politics",
+          "name": "BBC Politics",
+          "url": "http://feeds.bbci.co.uk/news/politics/rss.xml",
+          "description": "پوشش سیاسی بریتانیا و جهان",
+          "language": "en",
+          "region": "اروپا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1922,
+          "reliability_score": 9,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "guardian_politics",
+          "name": "The Guardian Politics",
+          "url": "https://www.theguardian.com/politics/rss",
+          "description": "تحلیل‌های سیاسی با رویکرد چپ",
+          "language": "en",
+          "region": "اروپا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1821,
+          "reliability_score": III,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "fox_news_politics",
+          "name": "Fox News Politics",
+          "url": "https://feeds.foxnews.com/foxnews/politics",
+          "description": "پوشش سیاسی با رویکرد محافظه‌کارانه",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1996,
+          "reliability_score": 7,
+          "bias_rating": "محافظه‌کار"
+        }
+      ]
+    },
+    
+    "business_finance": {
+      "id": "business_finance",
+      "name": "اقتصادی و مالی",
+      "description": "اخبار بازار، بورس، اقتصاد کلان و امور مالی",
+      "feeds": [
+        {
+          "id": "reuters_business",
+          "name": "Reuters Business",
+          "url": "http://feeds.reuters.com/reuters/businessNews",
+          "description": "اخبار تجاری و مالی بین‌المللی",
+          "language": "en",
+          "region": "بین‌الملل",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1851,
+          "reliability_score": 10,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "bloomberg",
+          "name": "Bloomberg",
+          "url": "https://www.bloomberg.com/feeds/podcasts/etf_report.xml",
+          "description": "تخصصی بازارهای مالی و سرمایه",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1981,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "financial_times",
+          "name": "Financial Times",
+          "url": "https://www.ft.com/?format=rss",
+          "description": "تحلیل‌های مالی و اقتصادی جهانی",
+          "language": "en",
+          "region": "اروپا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1888,
+          "reliability_score": 9,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "wall_street_journal",
+          "name": "The Wall Street Journal",
+          "url": "https://feeds.a.dj.com/rss/RSSWorldNews.xml",
+          "description": "اخبار بازار و اقتصاد با رویکرد محافظه‌کارانه",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1889,
+          "reliability_score": 9,
+          "bias_rating": "محافظه‌کار"
+        },
+        {
+          "id": "cnbc",
+          "name": "CNBC",
+          "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+          "description": "اخبار فوری بازار و کسب‌وکار",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1989,
+          "reliability_score": 8,
+          "bias_rating": "میانه‌رو"
+        },
+        {
+          "id": "donya_e_eqtesad",
+          "name": "دنیای اقتصاد",
+          "url": "https://donya-e-eqtesad.com/rss",
+          "description": "تحلیل‌های عمیق اقتصادی و بازار سرمایه ایران",
+          "language": "fa",
+          "region": "ایران",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1382,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "economist",
+          "name": "The Economist",
+          "url": "https://www.economist.com/rss",
+          "description": "تحلیل‌های اقتصادی و سیاسی جهانی",
+          "language": "en",
+          "region": "اروپا",
+          "type": "rss",
+          "update_frequency": "weekly",
+          "established": 1843,
+          "reliability_score": 9,
+          "bias_rating": "لیبرال"
+        }
+      ]
+    },
+    
+    "technology": {
+      "id": "technology",
+      "name": "فناوری",
+      "description": "اخبار فناوری، نوآوری، استارتاپ‌ها و دیجیتال",
+      "feeds": [
+        {
+          "id": "techcrunch",
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/feed/",
+          "description": "اخبار استارتاپ‌ها و فناوری سیلیکون ولی",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 2005,
+          "reliability_score": 8,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "wired",
+          "name": "Wired",
+          "url": "https://www.wired.com/feed/rss",
+          "description": "مقالات عمیق فناوری و فرهنگ دیجیتال",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "daily",
+          "established": 1993,
+          "reliability_score": 8,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "the_verge",
+          "name": "The Verge",
+          "url": "https://www.theverge.com/rss/index.xml",
+          "description": "پوشش گجت‌ها، علم و فرهنگ دیجیتال",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 2011,
+          "reliability_score": 8,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "ars_technica",
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/feed/",
+          "description": "تحلیل‌های فنی عمیق و اخبار فناوری",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "daily",
+          "established": 1998,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "digiato",
+          "name": "دیجیاتو",
+          "url": "https://digiato.com/feed",
+          "description": "تخصصی فناوری و گجت‌ها به فارسی",
+          "language": "fa",
+          "region": "ایران",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1391,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "zoomit",
+          "name": "زومیت",
+          "url": "https://www.zoomit.ir/feed",
+          "description": "اخبار فناوری و بررسی محصولات دیجیتال فارسی",
+          "language": "fa",
+          "region": "ایران",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1388,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "cnet",
+          "name": "CNET",
+          "url": "https://www.cnet.com/rss/news/",
+          "description": "اخبار فناوری و بررسی محصولات الکترونیکی",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1994,
+          "reliability_score": 8,
+          "bias_rating": "مستقل"
+        }
+      ]
+    },
+    
+    "sports": {
+      "id": "sports",
+      "name": "ورزشی",
+      "description": "پوشش جامع مسابقات ورزشی جهانی",
+      "feeds": [
+        {
+          "id": "espn",
+          "name": "ESPN",
+          "url": "http://www.espn.com/espn/rss/news",
+          "description": "شبکه ورزشی آمریکایی با پوشش جهانی",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1979,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "bbc_sport",
+          "name": "BBC Sport",
+          "url": "http://feeds.bbci.co.uk/sport/rss.xml",
+          "description": "پوشش ورزشی بریتانیا و جهان",
+          "language": "en",
+          "region": "اروپا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1922,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "varzesh3",
+          "name": "ورزش سه",
+          "url": "https://www.varzesh3.com/rss",
+          "description": "پرتخمین‌ترین سایت ورزشی ایران با تمرکز بر فوتبال",
+          "language": "fa",
+          "region": "ایران",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1385,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "sky_sports",
+          "name": "Sky Sports",
+          "url": "https://www.skysports.com/rss/12040",
+          "description": "شبکه ورزشی بریتانیایی",
+          "language": "en",
+          "region": "اروپا",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1990,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "nba_news",
+          "name": "NBA News",
+          "url": "https://www.nba.com/rss/nba_rss.xml",
+          "description": "اخبار رسمی ان‌بی‌ای",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "daily",
+          "established": 1946,
+          "reliability_score": 10,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "fifa_news",
+          "name": "FIFA News",
+          "url": "https://www.fifa.com/rss-feeds/news/rss.xml",
+          "description": "اخبار رسمی فیفا",
+          "language": "en",
+          "region": "بین‌الملل",
+          "type": "rss",
+          "update_frequency": "daily",
+          "established": 1904,
+          "reliability_score": 10,
+          "bias_rating": "مستقل"
+        }
+      ]
+    },
+    
+    "science_health": {
+      "id": "science_health",
+      "name": "علمی و بهداشتی",
+      "description": "تازه‌های علم، پزشکی، بهداشت و تحقیقات",
+      "feeds": [
+        {
+          "id": "nature",
+          "name": "Nature",
+          "url": "https://www.nature.com/nature.rss",
+          "description": "مقالات علمی پیشرو از نشریه نیچر",
+          "language": "en",
+          "region": "بین‌الملل",
+          "type": "rss",
+          "update_frequency": "weekly",
+          "established": 1869,
+          "reliability_score": 10,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "science_magazine",
+          "name": "Science Magazine",
+          "url": "https://www.science.org/rss/news_current.xml",
+          "description": "تازه‌های علمی از مجله ساینس",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "weekly",
+          "established": 1880,
+          "reliability_score": 10,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "nih_news",
+          "name": "NIH News",
+          "url": "https://www.nih.gov/news-events/news-releases/rss",
+          "description": "تازه‌های بهداشت و درمان از مؤسسه ملی سلامت آمریکا",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "daily",
+          "established": 1887,
+          "reliability_score": 10,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "new_scientist",
+          "name": "New Scientist",
+          "url": "https://www.newscientist.com/feed/home/",
+          "description": "اخبار علمی عمومی",
+          "language": "en",
+          "region": "اروپا",
+          "type": "rss",
+          "update_frequency": "daily",
+          "established": 1956,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "scientific_american",
+          "name": "Scientific American",
+          "url": "https://www.scientificamerican.com/rss/",
+          "description": "مقالات علمی برای عموم",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "weekly",
+          "established": 1845,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "isna_science",
+          "name": "ایسنا علمی",
+          "url": "https://www.isna.ir/rss/12",
+          "description": "اخبار علمی و دانشگاهی ایران",
+          "language": "fa",
+          "region": "ایران",
+          "type": "rss",
+          "update_frequency": "daily",
+          "established": 1378,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        }
+      ]
+    },
+    
+    "international": {
+      "id": "international",
+      "name": "بین‌الملل",
+      "description": "اخبار و تحلیل‌های بین‌المللی و منطقه‌ای",
+      "feeds": [
+        {
+          "id": "un_news",
+          "name": "UN News",
+          "url": "https://news.un.org/feed/subscribe/en/news/region/middle-east/feed/rss.xml",
+          "description": "خبرهای سازمان ملل متحد",
+          "language": "en",
+          "region": "بین‌الملل",
+          "type": "rss",
+          "update_frequency": "daily",
+          "established": 1945,
+          "reliability_score": 10,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "dw_news",
+          "name": "Deutsche Welle",
+          "url": "https://rss.dw.com/rdf/rss-en-top",
+          "description": "خبرگزاری بین‌المللی آلمان",
+          "language": "en",
+          "region": "اروپا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1953,
+          "reliability_score": 9,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "france24",
+          "name": "France 24",
+          "url": "https://www.france24.com/en/rss",
+          "description": "شبکه خبری بین‌المللی فرانسه",
+          "language": "en",
+          "region": "اروپا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 2006,
+          "reliability_score": 9,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "bbc_world_service",
+          "name": "BBC World Service",
+          "url": "http://feeds.bbci.co.uk/news/world/rss.xml",
+          "description": "سرویس جهانی بی‌بی‌سی",
+          "language": "en",
+          "region": "اروپا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1932,
+          "reliability_score": 9,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "ap_international",
+          "name": "AP International",
+          "url": "https://apnews.com/apf-intlnews",
+          "description": "اخبار بین‌المللی از آسوشیتدپرس",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "realtime",
+          "established": 1846,
+          "reliability_score": 10,
+          "bias_rating": "مستقل"
+        }
+      ]
+    },
+    
+    "culture_entertainment": {
+      "id": "culture_entertainment",
+      "name": "فرهنگی و سرگرمی",
+      "description": "اخبار سینما، موسیقی، هنر و سرگرمی",
+      "feeds": [
+        {
+          "id": "variety",
+          "name": "Variety",
+          "url": "https://variety.com/feed/",
+          "description": "اخبار صنعت سرگرمی و هالیوود",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1905,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "hollywood_reporter",
+          "name": "The Hollywood Reporter",
+          "url": "https://www.hollywoodreporter.com/feed/",
+          "description": "اخبار صنعت فیلم و تلویزیون",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "hourly",
+          "established": 1930,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "rolling_stone",
+          "name": "Rolling Stone",
+          "url": "https://www.rollingstone.com/feed/",
+          "description": "اخبار موسیقی و فرهنگ پاپ",
+          "language": "en",
+          "region": "آمریکا",
+          "type": "rss",
+          "update_frequency": "daily",
+          "established": 1967,
+          "reliability_score": 8,
+          "bias_rating": "لیبرال"
+        },
+        {
+          "id": "cinemacinema",
+          "name": "سینما سینما",
+          "url": "https://www.cinemacinema.ir/rss",
+          "description": "تخصصی سینما و سریال فارسی",
+          "language": "fa",
+          "region": "ایران",
+          "type": "rss",
+          "update_frequency": "daily",
+          "established": 1390,
+          "reliability_score": 8,
+          "bias_rating": "مستقل"
+        },
+        {
+          "id": "bookcity",
+          "name": "شهر کتاب",
+          "url": "https://www.bookcity.org/rss",
+          "description": "اخبار و نقد کتاب و ادبیات فارسی",
+          "language": "fa",
+          "region": "ایران",
+          "type": "rss",
+          "update_frequency": "weekly",
+          "established": 1385,
+          "reliability_score": 9,
+          "bias_rating": "مستقل"
+        }
+      ]
+    }
+  },
+  
+  "statistics": {
+    "total_feeds": 68,
+    "total_categories": 8,
+    "languages": {
+      "fa": 18,
+      "en": 50
+    },
+    "regions": {
+      "ایران": 18,
+      "آمریکا": 25,
+      "اروپا": 12,
+      "بین‌الملل": 8,
+      "خاورمیانه": 5
+    },
+    "oldest_established": 1843,
+    "newest_established": 2011,
+    "reliability_distribution": {
+      "10": 12,
+      "9": 25,
+      "8": 24,
+      "7": 7
+    }
+  },
+  
+  "schema_version": "3.0",
+  "last_updated": "1405/03/22 15:45",
+  "update_notes": "افزودن خبرگزاری‌های معتبر انگلیسی و آمریکایی به تمام دسته‌بندی‌ها"
+}
