@@ -12,11 +12,13 @@ class Category {
   final String remoteUrl;
   
   final String source;
+  bool isLocalOnly;
 
   Category({
     this.id = 0,
     required this.name,
     required this.remoteUrl,
     required this.source,
+    this.isLocalOnly = false,
   });
 }
