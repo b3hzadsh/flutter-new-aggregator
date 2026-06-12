@@ -2,14 +2,18 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../../objectbox.g.dart';
 import '../../domain/entities/news_item.dart';
+import '../../domain/entities/category.dart';
 import '../../domain/repositories/news_storage.dart';
 
 class ObjectBoxStore implements NewsStorage {
-  late final Store store;
-  late final Box<NewsItem> newsBox;
+  final Store store;
+  final Box<NewsItem> newsBox;
+  final Box<Category> categoryBox;
 
-  ObjectBoxStore.fromStore(this.store) {
-    newsBox = Box<NewsItem>(store);
+  ObjectBoxStore.fromStore(this.store)
+      : newsBox = Box<NewsItem>(store),
+        categoryBox = Box<Category>(store) {
+    _seedIfEmpty();
   }
 
   static Future<ObjectBoxStore> create() async {
@@ -43,6 +47,45 @@ class ObjectBoxStore implements NewsStorage {
         .order(NewsItem_.publishDate, flags: Order.descending)
         .watch(triggerImmediately: true)
         .map((q) => q.find());
+  }
+
+  @override
+  Future<List<Category>> getAllCategories() async {
+    return categoryBox.getAll();
+  }
+
+  @override
+  Future<void> seedCategories(List<Category> categories) async {
+    categoryBox.putMany(categories);
+  }
+
+  @override
+  Stream<List<NewsItem>> watchItemsByCategory(int categoryId) {
+    return newsBox
+        .query(NewsItem_.category.equals(categoryId))
+        .order(NewsItem_.publishDate, flags: Order.descending)
+        .watch(triggerImmediately: true)
+        .map((q) => q.find());
+  }
+
+  void _seedIfEmpty() {
+    if (categoryBox.isEmpty()) {
+      final defaults = [
+        Category(
+            name: 'ISNA', remoteUrl: 'https://www.isna.ir/rss', source: 'ISNA'),
+        Category(
+            name: 'Mehr',
+            remoteUrl: 'https://www.mehrnews.com/rss',
+            source: 'Mehr'),
+        Category(
+            name: 'IRNA', remoteUrl: 'https://www.irna.ir/rss', source: 'IRNA'),
+        Category(
+            name: 'Tasnim',
+            remoteUrl: 'https://www.tasnimnews.com/fa/rss/feed/0/7/1/',
+            source: 'Tasnim'),
+      ];
+      categoryBox.putMany(defaults);
+    }
   }
 
   @override
