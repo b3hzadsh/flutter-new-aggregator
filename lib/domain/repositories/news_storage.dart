@@ -9,5 +9,8 @@ abstract class NewsStorage {
   Future<List<Category>> getAllCategories();
   Future<void> seedCategories(List<Category> categories);
   Stream<List<NewsItem>> watchItemsByCategory(int categoryId);
+  Future<void> clearAllNews();
+  Future<void> updateNewsStatus(int id, {bool? isRead, bool? isBookmarked});
+  Stream<List<NewsItem>> watchBookmarks();
   Future<void> close();
 }
