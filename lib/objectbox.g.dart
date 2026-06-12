@@ -23,7 +23,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 1836617437630631139),
     name: 'NewsItem',
-    lastPropertyId: const obx_int.IdUid(11, 7115271584127297927),
+    lastPropertyId: const obx_int.IdUid(12, 2201504685307884630),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -98,6 +98,12 @@ final _entities = <obx_int.ModelEntity>[
         relationField: 'category',
         relationTarget: 'Category',
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(12, 2201504685307884630),
+        name: 'isBookmarked',
+        type: 1,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -105,7 +111,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 6492590044570806792),
     name: 'Category',
-    lastPropertyId: const obx_int.IdUid(4, 2760860092243372791),
+    lastPropertyId: const obx_int.IdUid(5, 632269168761744043),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -132,6 +138,12 @@ final _entities = <obx_int.ModelEntity>[
         id: const obx_int.IdUid(4, 2760860092243372791),
         name: 'source',
         type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(5, 632269168761744043),
+        name: 'isLocalOnly',
+        type: 1,
         flags: 0,
       ),
     ],
@@ -214,7 +226,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ? null
             : fbb.writeString(object.imageUrl!);
         final sourceNameOffset = fbb.writeString(object.sourceName);
-        fbb.startTable(12);
+        fbb.startTable(13);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, remoteIdOffset);
         fbb.addOffset(2, titleOffset);
@@ -226,6 +238,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addBool(8, object.isRead);
         fbb.addBool(9, object.isPriority);
         fbb.addInt64(10, object.category.targetId);
+        fbb.addBool(11, object.isBookmarked);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -271,6 +284,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
           22,
           false,
         );
+        final isBookmarkedParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          26,
+          false,
+        );
         final object = NewsItem(
           id: idParam,
           remoteId: remoteIdParam,
@@ -282,6 +301,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           publishDate: publishDateParam,
           isRead: isReadParam,
           isPriority: isPriorityParam,
+          isBookmarked: isBookmarkedParam,
         );
         object.category.targetId = const fb.Int64Reader().vTableGet(
           buffer,
@@ -305,11 +325,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final nameOffset = fbb.writeString(object.name);
         final remoteUrlOffset = fbb.writeString(object.remoteUrl);
         final sourceOffset = fbb.writeString(object.source);
-        fbb.startTable(5);
+        fbb.startTable(6);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
         fbb.addOffset(2, remoteUrlOffset);
         fbb.addOffset(3, sourceOffset);
+        fbb.addBool(4, object.isLocalOnly);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -331,11 +352,18 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final sourceParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 10, '');
+        final isLocalOnlyParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          12,
+          false,
+        );
         final object = Category(
           id: idParam,
           name: nameParam,
           remoteUrl: remoteUrlParam,
           source: sourceParam,
+          isLocalOnly: isLocalOnlyParam,
         );
 
         return object;
@@ -402,6 +430,11 @@ class NewsItem_ {
   static final category = obx.QueryRelationToOne<NewsItem, Category>(
     _entities[0].properties[10],
   );
+
+  /// See [NewsItem.isBookmarked].
+  static final isBookmarked = obx.QueryBooleanProperty<NewsItem>(
+    _entities[0].properties[11],
+  );
 }
 
 /// [Category] entity fields to define ObjectBox queries.
@@ -424,5 +457,10 @@ class Category_ {
   /// See [Category.source].
   static final source = obx.QueryStringProperty<Category>(
     _entities[1].properties[3],
+  );
+
+  /// See [Category.isLocalOnly].
+  static final isLocalOnly = obx.QueryBooleanProperty<Category>(
+    _entities[1].properties[4],
   );
 }
