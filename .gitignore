@@ -47,3 +47,6 @@ app.*.map.json
 
 GEMINI.md
 .gemini/
+QWEN.md
+.qwen/settings.json
+.qwen/settings.json.orig
