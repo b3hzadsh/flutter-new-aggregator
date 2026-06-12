@@ -4,13 +4,25 @@ import '../../domain/repositories/news_storage.dart';
 import '../../domain/entities/category.dart';
 import '../cubits/news_cubit.dart';
 
-class CategoryDrawer extends StatelessWidget {
+class CategoryDrawer extends StatefulWidget {
   const CategoryDrawer({super.key});
+
+  @override
+  State<CategoryDrawer> createState() => _CategoryDrawerState();
+}
+
+class _CategoryDrawerState extends State<CategoryDrawer> {
+  late final Future<List<Category>> _categoriesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _categoriesFuture = context.read<NewsCubit>().db.getAllCategories();
+  }
 
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<NewsCubit>();
-    final db = cubit.db;
 
     return Drawer(
       child: Column(
@@ -30,7 +42,7 @@ class CategoryDrawer extends StatelessWidget {
           ),
           Expanded(
             child: FutureBuilder<List<Category>>(
-              future: db.getAllCategories(),
+              future: _categoriesFuture,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
@@ -52,7 +64,8 @@ class CategoryDrawer extends StatelessWidget {
                         ),
                         ...categories.map((category) => ListTile(
                               title: Text(category.name),
-                              selected: state.selectedCategory?.id == category.id,
+                              selected:
+                                  state.selectedCategory?.id == category.id,
                               onTap: () {
                                 cubit.selectCategory(category);
                                 Navigator.pop(context);
