@@ -51,9 +51,15 @@ class NewsCubit extends Cubit<NewsState> {
 
   void _subscribe() {
     _subscription?.cancel();
-    final stream = state.selectedCategory == null
-        ? db.watchAllItems()
-        : db.watchItemsByCategory(state.selectedCategory!.id);
+    
+    final Stream<List<NewsItem>> stream;
+    if (state.isShowingBookmarks) {
+      stream = db.watchBookmarks();
+    } else if (state.selectedCategory != null) {
+      stream = db.watchItemsByCategory(state.selectedCategory!.id);
+    } else {
+      stream = db.watchAllItems();
+    }
 
     _subscription = stream.listen((items) {
       emit(state.copyWith(items: items));
@@ -66,6 +72,25 @@ class NewsCubit extends Cubit<NewsState> {
     } else {
       emit(state.copyWith(selectedCategory: category));
     }
+    _subscribe();
+  }
+
+  Future<void> toggleBookmark(NewsItem item) async {
+    await db.updateNewsStatus(item.id, isBookmarked: !item.isBookmarked);
+  }
+
+  Future<void> markAsRead(NewsItem item) async {
+    if (!item.isRead) {
+      await db.updateNewsStatus(item.id, isRead: true);
+    }
+  }
+
+  Future<void> clearDatabase() async {
+    await db.clearAllNews();
+  }
+
+  void showBookmarksOnly(bool show) {
+    emit(state.copyWith(isShowingBookmarks: show));
     _subscribe();
   }
 
