@@ -14,6 +14,7 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
+import 'domain/entities/category.dart';
 import 'domain/entities/news_item.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -22,7 +23,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 1836617437630631139),
     name: 'NewsItem',
-    lastPropertyId: const obx_int.IdUid(10, 5908834045285893994),
+    lastPropertyId: const obx_int.IdUid(11, 7115271584127297927),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -88,6 +89,51 @@ final _entities = <obx_int.ModelEntity>[
         type: 1,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(11, 7115271584127297927),
+        name: 'categoryId',
+        type: 11,
+        flags: 520,
+        indexId: const obx_int.IdUid(6, 4344473782344540753),
+        relationField: 'category',
+        relationTarget: 'Category',
+      ),
+    ],
+    relations: <obx_int.ModelRelation>[],
+    backlinks: <obx_int.ModelBacklink>[],
+  ),
+  obx_int.ModelEntity(
+    id: const obx_int.IdUid(2, 6492590044570806792),
+    name: 'Category',
+    lastPropertyId: const obx_int.IdUid(4, 2760860092243372791),
+    flags: 0,
+    properties: <obx_int.ModelProperty>[
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(1, 334930766007385412),
+        name: 'id',
+        type: 6,
+        flags: 1,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(2, 4359455555824256452),
+        name: 'name',
+        type: 9,
+        flags: 2048,
+        indexId: const obx_int.IdUid(4, 3884175598625506349),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(3, 1367047334910722210),
+        name: 'remoteUrl',
+        type: 9,
+        flags: 2080,
+        indexId: const obx_int.IdUid(5, 680063547437429529),
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(4, 2760860092243372791),
+        name: 'source',
+        type: 9,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -137,8 +183,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
     // Typically, this is done with `dart run build_runner build`.
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
-    lastEntityId: const obx_int.IdUid(1, 1836617437630631139),
-    lastIndexId: const obx_int.IdUid(3, 801685968950944828),
+    lastEntityId: const obx_int.IdUid(2, 6492590044570806792),
+    lastIndexId: const obx_int.IdUid(6, 4344473782344540753),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
@@ -153,7 +199,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
   final bindings = <Type, obx_int.EntityDefinition>{
     NewsItem: obx_int.EntityDefinition<NewsItem>(
       model: _entities[0],
-      toOneRelations: (NewsItem object) => [],
+      toOneRelations: (NewsItem object) => [object.category],
       toManyRelations: (NewsItem object) => {},
       getId: (NewsItem object) => object.id,
       setId: (NewsItem object, int id) {
@@ -168,7 +214,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ? null
             : fbb.writeString(object.imageUrl!);
         final sourceNameOffset = fbb.writeString(object.sourceName);
-        fbb.startTable(11);
+        fbb.startTable(12);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, remoteIdOffset);
         fbb.addOffset(2, titleOffset);
@@ -179,6 +225,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addInt64(7, object.publishDate.millisecondsSinceEpoch);
         fbb.addBool(8, object.isRead);
         fbb.addBool(9, object.isPriority);
+        fbb.addInt64(10, object.category.targetId);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -235,6 +282,60 @@ obx_int.ModelDefinition getObjectBoxModel() {
           publishDate: publishDateParam,
           isRead: isReadParam,
           isPriority: isPriorityParam,
+        );
+        object.category.targetId = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          24,
+          0,
+        );
+        object.category.attach(store);
+        return object;
+      },
+    ),
+    Category: obx_int.EntityDefinition<Category>(
+      model: _entities[1],
+      toOneRelations: (Category object) => [],
+      toManyRelations: (Category object) => {},
+      getId: (Category object) => object.id,
+      setId: (Category object, int id) {
+        object.id = id;
+      },
+      objectToFB: (Category object, fb.Builder fbb) {
+        final nameOffset = fbb.writeString(object.name);
+        final remoteUrlOffset = fbb.writeString(object.remoteUrl);
+        final sourceOffset = fbb.writeString(object.source);
+        fbb.startTable(5);
+        fbb.addInt64(0, object.id);
+        fbb.addOffset(1, nameOffset);
+        fbb.addOffset(2, remoteUrlOffset);
+        fbb.addOffset(3, sourceOffset);
+        fbb.finish(fbb.endTable());
+        return object.id;
+      },
+      objectFromFB: (obx.Store store, ByteData fbData) {
+        final buffer = fb.BufferContext(fbData);
+        final rootOffset = buffer.derefObject(0);
+        final idParam = const fb.Int64Reader().vTableGet(
+          buffer,
+          rootOffset,
+          4,
+          0,
+        );
+        final nameParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 6, '');
+        final remoteUrlParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 8, '');
+        final sourceParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGet(buffer, rootOffset, 10, '');
+        final object = Category(
+          id: idParam,
+          name: nameParam,
+          remoteUrl: remoteUrlParam,
+          source: sourceParam,
         );
 
         return object;
@@ -295,5 +396,33 @@ class NewsItem_ {
   /// See [NewsItem.isPriority].
   static final isPriority = obx.QueryBooleanProperty<NewsItem>(
     _entities[0].properties[9],
+  );
+
+  /// See [NewsItem.category].
+  static final category = obx.QueryRelationToOne<NewsItem, Category>(
+    _entities[0].properties[10],
+  );
+}
+
+/// [Category] entity fields to define ObjectBox queries.
+class Category_ {
+  /// See [Category.id].
+  static final id = obx.QueryIntegerProperty<Category>(
+    _entities[1].properties[0],
+  );
+
+  /// See [Category.name].
+  static final name = obx.QueryStringProperty<Category>(
+    _entities[1].properties[1],
+  );
+
+  /// See [Category.remoteUrl].
+  static final remoteUrl = obx.QueryStringProperty<Category>(
+    _entities[1].properties[2],
+  );
+
+  /// See [Category.source].
+  static final source = obx.QueryStringProperty<Category>(
+    _entities[1].properties[3],
   );
 }

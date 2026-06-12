@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:1836617437630631139",
-      "lastPropertyId": "10:5908834045285893994",
+      "lastPropertyId": "11:7115271584127297927",
       "name": "NewsItem",
       "properties": [
         {
@@ -64,13 +64,54 @@
           "id": "10:5908834045285893994",
           "name": "isPriority",
           "type": 1
+        },
+        {
+          "id": "11:7115271584127297927",
+          "name": "categoryId",
+          "indexId": "6:4344473782344540753",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Category"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:6492590044570806792",
+      "lastPropertyId": "4:2760860092243372791",
+      "name": "Category",
+      "properties": [
+        {
+          "id": "1:334930766007385412",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4359455555824256452",
+          "name": "name",
+          "indexId": "4:3884175598625506349",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "3:1367047334910722210",
+          "name": "remoteUrl",
+          "indexId": "5:680063547437429529",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "4:2760860092243372791",
+          "name": "source",
+          "type": 9
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "1:1836617437630631139",
-  "lastIndexId": "3:801685968950944828",
+  "lastEntityId": "2:6492590044570806792",
+  "lastIndexId": "6:4344473782344540753",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
