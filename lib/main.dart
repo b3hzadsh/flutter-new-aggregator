@@ -9,6 +9,8 @@ import 'package:news_aggregator/data/services/sync_service.dart';
 import 'package:news_aggregator/presentation/cubits/news_cubit.dart';
 import 'package:news_aggregator/presentation/cubits/theme_cubit.dart';
 import 'package:news_aggregator/presentation/pages/news_list_page.dart';
+import 'package:news_aggregator/data/services/network_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,16 +21,16 @@ void main() async {
 
   final db = await ObjectBoxStore.create();
   final dio = Dio();
+  final connectivity = Connectivity();
+  final networkService = NetworkService(dio, connectivity);
   final rssDataSource = RssDataSource(dio: dio);
   final syncService = SyncService(rssDataSource, db);
   final prefs = await SharedPreferences.getInstance();
 
-  // Trigger initial sync
-  syncService.sync();
-
   runApp(MyApp(
     db: db,
     syncService: syncService,
+    networkService: networkService,
     prefs: prefs,
   ));
 }
@@ -36,12 +38,14 @@ void main() async {
 class MyApp extends StatelessWidget {
   final ObjectBoxStore db;
   final SyncService syncService;
+  final NetworkService networkService;
   final SharedPreferences prefs;
 
   const MyApp({
     super.key,
     required this.db,
     required this.syncService,
+    required this.networkService,
     required this.prefs,
   });
 
@@ -51,11 +55,12 @@ class MyApp extends StatelessWidget {
       providers: [
         RepositoryProvider.value(value: db),
         RepositoryProvider.value(value: syncService),
+        RepositoryProvider.value(value: networkService),
         RepositoryProvider.value(value: prefs),
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => NewsCubit(db, syncService)),
+          BlocProvider(create: (context) => NewsCubit(db, syncService, networkService)),
           BlocProvider(create: (context) => ThemeCubit(prefs)),
         ],
         child: BlocBuilder<ThemeCubit, ThemeMode>(

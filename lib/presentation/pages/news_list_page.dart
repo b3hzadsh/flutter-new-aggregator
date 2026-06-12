@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/news_cubit.dart';
+import '../cubits/theme_cubit.dart';
 import '../pages/news_detail_page.dart';
 import '../widgets/news_card.dart';
 import '../widgets/category_drawer.dart';
@@ -31,9 +32,28 @@ class _NewsListPageState extends State<NewsListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NewsCubit, NewsState>(
-      builder: (context, state) {
-        return Scaffold(
+    return BlocListener<NewsCubit, NewsState>(
+      listenWhen: (previous, current) =>
+          previous.error != current.error && current.error == 'NO_INTERNET',
+      listener: (context, state) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('عدم اتصال به اینترنت'),
+            content: const Text(
+                'برای به‌روزرسانی اخبار نیاز به اتصال اینترنت دارید. لطفاً وضعیت شبکه خود را بررسی کنید.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('تایید'),
+              ),
+            ],
+          ),
+        );
+      },
+      child: BlocBuilder<NewsCubit, NewsState>(
+        builder: (context, state) {
+          return Scaffold(
           drawer: const CategoryDrawer(),
           body: RefreshIndicator(
             onRefresh: () => context.read<NewsCubit>().sync(),
@@ -44,6 +64,16 @@ class _NewsListPageState extends State<NewsListPage> {
                   snap: true,
                   centerTitle: true,
                   title: Text(state.selectedCategory?.name ?? 'تازه‌ترین اخبار'),
+                  actions: [
+                    BlocBuilder<ThemeCubit, ThemeMode>(
+                      builder: (context, mode) {
+                        return IconButton(
+                          icon: Icon(mode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode),
+                          onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+                        );
+                      },
+                    ),
+                  ],
                   bottom: PreferredSize(
                     preferredSize: const Size.fromHeight(70),
                     child: Padding(
@@ -118,6 +148,7 @@ class _NewsListPageState extends State<NewsListPage> {
           ),
         );
       },
-    );
-  }
+    ),
+  );
+}
 }

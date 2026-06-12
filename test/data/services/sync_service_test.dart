@@ -48,7 +48,7 @@ void main() {
     when(() => mockDataSource.fetchFeed('url', 'test'))
         .thenAnswer((_) async => [newItem]);
 
-    await syncService.sync();
+    await syncService.sync(true);
 
     expect(db.newsBox.count(), 1);
     final stored = db.newsBox.getAll().first;
@@ -82,7 +82,7 @@ void main() {
     when(() => mockDataSource.fetchFeed('url', 'test'))
         .thenAnswer((_) async => [newItem]);
 
-    await syncService.sync();
+    await syncService.sync(true);
 
     expect(db.newsBox.count(), 1);
     expect(db.newsBox.getAll().first.title, 'Old Title');
@@ -115,7 +115,7 @@ void main() {
     when(() => mockDataSource.fetchFeed('url2', 'src2'))
         .thenAnswer((_) async => [item2]);
 
-    await syncService.sync();
+    await syncService.sync(true);
 
     expect(db.newsBox.count(), 2);
     final storedItems = db.newsBox.getAll();

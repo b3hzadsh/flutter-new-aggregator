@@ -13,6 +13,7 @@ class MockSyncService extends Mock implements SyncService {}
 void main() {
   late MockNewsStorage mockStorage;
   late MockSyncService mockSyncService;
+  late MockNetworkService mockNetworkService;
   late NewsCubit cubit;
   late StreamController<List<NewsItem>> allItemsController;
   late StreamController<List<NewsItem>> categoryItemsController;
@@ -20,13 +21,16 @@ void main() {
   setUp(() {
     mockStorage = MockNewsStorage();
     mockSyncService = MockSyncService();
+    mockNetworkService = MockNetworkService();
     allItemsController = StreamController<List<NewsItem>>.broadcast();
     categoryItemsController = StreamController<List<NewsItem>>.broadcast();
 
     when(() => mockStorage.watchAllItems()).thenAnswer((_) => allItemsController.stream);
     when(() => mockStorage.watchItemsByCategory(any())).thenAnswer((_) => categoryItemsController.stream);
+    when(() => mockNetworkService.hasInternet()).thenAnswer((_) async => true);
+    when(() => mockNetworkService.isIranianIp()).thenAnswer((_) async => true);
 
-    cubit = NewsCubit(mockStorage, mockSyncService);
+    cubit = NewsCubit(mockStorage, mockSyncService, mockNetworkService);
   });
 
   tearDown(() async {
@@ -93,7 +97,7 @@ void main() {
   });
 
   test('sync updates loading state', () async {
-    when(() => mockSyncService.sync()).thenAnswer((_) async {});
+    when(() => mockSyncService.sync(any())).thenAnswer((_) async {});
 
     final syncFuture = cubit.sync();
 
@@ -103,15 +107,25 @@ void main() {
 
     expect(cubit.state.isLoading, isFalse);
     expect(cubit.state.error, isNull);
-    verify(() => mockSyncService.sync()).called(1);
+    verify(() => mockSyncService.sync(any())).called(1);
   });
 
   test('sync handles error', () async {
-    when(() => mockSyncService.sync()).thenThrow(Exception('Sync failed'));
+    when(() => mockSyncService.sync(any())).thenThrow(Exception('Sync failed'));
 
     await cubit.sync();
 
     expect(cubit.state.isLoading, isFalse);
     expect(cubit.state.error, contains('Sync failed'));
+  });
+
+  test('sync handles no internet', () async {
+    when(() => mockNetworkService.hasInternet()).thenAnswer((_) async => false);
+
+    await cubit.sync();
+
+    expect(cubit.state.isLoading, isFalse);
+    expect(cubit.state.error, equals('NO_INTERNET'));
+    verifyNever(() => mockSyncService.sync(any()));
   });
 }

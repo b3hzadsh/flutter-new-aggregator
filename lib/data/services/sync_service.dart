@@ -12,8 +12,13 @@ class SyncService {
     this.db,
   );
 
-  Future<void> sync() async {
-    final categories = await db.getAllCategories();
+  Future<void> sync(bool isIranianIp) async {
+    final allCategories = await db.getAllCategories();
+    final categories = allCategories.where((c) {
+      if (c.isLocalOnly && !isIranianIp) return false;
+      return true;
+    }).toList();
+
     if (categories.isEmpty) return;
 
     final List<NewsItem> allNewItems = [];

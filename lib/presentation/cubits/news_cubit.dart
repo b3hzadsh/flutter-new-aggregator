@@ -4,6 +4,7 @@ import '../../domain/entities/news_item.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/repositories/news_storage.dart';
 import '../../data/services/sync_service.dart';
+import '../../data/services/network_service.dart';
 
 class NewsState {
   final List<NewsItem> items;
@@ -37,9 +38,10 @@ class NewsState {
 class NewsCubit extends Cubit<NewsState> {
   final NewsStorage db;
   final SyncService syncService;
+  final NetworkService networkService;
   StreamSubscription? _subscription;
 
-  NewsCubit(this.db, this.syncService) : super(NewsState(items: [])) {
+  NewsCubit(this.db, this.syncService, this.networkService) : super(NewsState(items: [])) {
     _subscribe();
   }
 
@@ -66,7 +68,14 @@ class NewsCubit extends Cubit<NewsState> {
   Future<void> sync() async {
     try {
       emit(state.copyWith(isLoading: true, error: null));
-      await syncService.sync();
+      
+      if (!await networkService.hasInternet()) {
+        emit(state.copyWith(isLoading: false, error: 'NO_INTERNET'));
+        return;
+      }
+
+      final isIranianIp = await networkService.isIranianIp();
+      await syncService.sync(isIranianIp);
       emit(state.copyWith(isLoading: false));
     } catch (e) {
       emit(state.copyWith(isLoading: false, error: e.toString()));
