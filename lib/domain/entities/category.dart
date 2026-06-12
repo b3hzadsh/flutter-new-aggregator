@@ -7,17 +7,17 @@ class Category {
   int id = 0;
 
   @Unique()
-  final String remoteId;
+  final String slug;
 
   @Index()
   final String name;
 
-  @Backlink('category')
+  @Backlink()
   final feeds = ToMany<FeedSource>();
 
   Category({
     this.id = 0,
-    required this.remoteId,
+    required this.slug,
     required this.name,
   });
 }

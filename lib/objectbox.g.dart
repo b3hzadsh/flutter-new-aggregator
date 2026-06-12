@@ -24,7 +24,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 1836617437630631139),
     name: 'NewsItem',
-    lastPropertyId: const obx_int.IdUid(13, 4753991589717073638),
+    lastPropertyId: const obx_int.IdUid(14, 1553628831525844640),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -97,12 +97,12 @@ final _entities = <obx_int.ModelEntity>[
         flags: 0,
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(13, 4753991589717073638),
-        name: 'feedSourceId',
+        id: const obx_int.IdUid(14, 1553628831525844640),
+        name: 'feedId',
         type: 11,
         flags: 520,
-        indexId: const obx_int.IdUid(11, 8043770954655030617),
-        relationField: 'feedSource',
+        indexId: const obx_int.IdUid(13, 1458521532280577172),
+        relationField: 'feed',
         relationTarget: 'FeedSource',
       ),
     ],
@@ -112,7 +112,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 6492590044570806792),
     name: 'Category',
-    lastPropertyId: const obx_int.IdUid(6, 1924350965443868698),
+    lastPropertyId: const obx_int.IdUid(7, 2987806107555565858),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -129,11 +129,11 @@ final _entities = <obx_int.ModelEntity>[
         indexId: const obx_int.IdUid(4, 3884175598625506349),
       ),
       obx_int.ModelProperty(
-        id: const obx_int.IdUid(6, 1924350965443868698),
-        name: 'remoteId',
+        id: const obx_int.IdUid(7, 2987806107555565858),
+        name: 'slug',
         type: 9,
         flags: 2080,
-        indexId: const obx_int.IdUid(7, 5207263346692712083),
+        indexId: const obx_int.IdUid(12, 3430647383132511857),
       ),
     ],
     relations: <obx_int.ModelRelation>[],
@@ -141,7 +141,7 @@ final _entities = <obx_int.ModelEntity>[
       obx_int.ModelBacklink(
         name: 'feeds',
         srcEntity: 'FeedSource',
-        srcField: 'category',
+        srcField: '',
       ),
     ],
   ),
@@ -242,16 +242,23 @@ obx_int.ModelDefinition getObjectBoxModel() {
     generatorVersion: obx_int.GeneratorVersion.v2025_12_16,
     entities: _entities,
     lastEntityId: const obx_int.IdUid(3, 3099189070807932972),
-    lastIndexId: const obx_int.IdUid(11, 8043770954655030617),
+    lastIndexId: const obx_int.IdUid(13, 1458521532280577172),
     lastRelationId: const obx_int.IdUid(0, 0),
     lastSequenceId: const obx_int.IdUid(0, 0),
     retiredEntityUids: const [],
-    retiredIndexUids: const [680063547437429529, 4344473782344540753],
+    retiredIndexUids: const [
+      680063547437429529,
+      4344473782344540753,
+      5207263346692712083,
+      8043770954655030617,
+    ],
     retiredPropertyUids: const [
       1367047334910722210,
       2760860092243372791,
       632269168761744043,
       7115271584127297927,
+      1924350965443868698,
+      4753991589717073638,
     ],
     retiredRelationUids: const [],
     modelVersion: 5,
@@ -262,7 +269,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
   final bindings = <Type, obx_int.EntityDefinition>{
     NewsItem: obx_int.EntityDefinition<NewsItem>(
       model: _entities[0],
-      toOneRelations: (NewsItem object) => [object.feedSource],
+      toOneRelations: (NewsItem object) => [object.feed],
       toManyRelations: (NewsItem object) => {},
       getId: (NewsItem object) => object.id,
       setId: (NewsItem object, int id) {
@@ -277,7 +284,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
             ? null
             : fbb.writeString(object.imageUrl!);
         final sourceNameOffset = fbb.writeString(object.sourceName);
-        fbb.startTable(14);
+        fbb.startTable(15);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, remoteIdOffset);
         fbb.addOffset(2, titleOffset);
@@ -289,7 +296,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addBool(8, object.isRead);
         fbb.addBool(9, object.isPriority);
         fbb.addBool(11, object.isBookmarked);
-        fbb.addInt64(12, object.feedSource.targetId);
+        fbb.addInt64(13, object.feed.targetId);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -354,13 +361,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
           isPriority: isPriorityParam,
           isBookmarked: isBookmarkedParam,
         );
-        object.feedSource.targetId = const fb.Int64Reader().vTableGet(
+        object.feed.targetId = const fb.Int64Reader().vTableGet(
           buffer,
           rootOffset,
-          28,
+          30,
           0,
         );
-        object.feedSource.attach(store);
+        object.feed.attach(store);
         return object;
       },
     ),
@@ -380,11 +387,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
       },
       objectToFB: (Category object, fb.Builder fbb) {
         final nameOffset = fbb.writeString(object.name);
-        final remoteIdOffset = fbb.writeString(object.remoteId);
-        fbb.startTable(7);
+        final slugOffset = fbb.writeString(object.slug);
+        fbb.startTable(8);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, nameOffset);
-        fbb.addOffset(5, remoteIdOffset);
+        fbb.addOffset(6, slugOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -397,17 +404,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
           4,
           0,
         );
-        final remoteIdParam = const fb.StringReader(
+        final slugParam = const fb.StringReader(
           asciiOptimization: true,
-        ).vTableGet(buffer, rootOffset, 14, '');
+        ).vTableGet(buffer, rootOffset, 16, '');
         final nameParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGet(buffer, rootOffset, 6, '');
-        final object = Category(
-          id: idParam,
-          remoteId: remoteIdParam,
-          name: nameParam,
-        );
+        final object = Category(id: idParam, slug: slugParam, name: nameParam);
         obx_int.InternalToManyAccess.setRelInfo<Category>(
           object.feeds,
           store,
@@ -545,8 +548,8 @@ class NewsItem_ {
     _entities[0].properties[10],
   );
 
-  /// See [NewsItem.feedSource].
-  static final feedSource = obx.QueryRelationToOne<NewsItem, FeedSource>(
+  /// See [NewsItem.feed].
+  static final feed = obx.QueryRelationToOne<NewsItem, FeedSource>(
     _entities[0].properties[11],
   );
 }
@@ -563,8 +566,8 @@ class Category_ {
     _entities[1].properties[1],
   );
 
-  /// See [Category.remoteId].
-  static final remoteId = obx.QueryStringProperty<Category>(
+  /// See [Category.slug].
+  static final slug = obx.QueryStringProperty<Category>(
     _entities[1].properties[2],
   );
 

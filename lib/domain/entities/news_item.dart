@@ -6,7 +6,7 @@ class NewsItem {
   @Id()
   int id = 0;
 
-  final feedSource = ToOne<FeedSource>();
+  final feed = ToOne<FeedSource>();
 
   @Index(type: IndexType.hash)
   final String remoteId;
