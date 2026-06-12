@@ -7,8 +7,10 @@ import 'package:news_aggregator/data/storage/objectbox_store.dart';
 import 'package:news_aggregator/data/sources/rss_data_source.dart';
 import 'package:news_aggregator/data/services/sync_service.dart';
 import 'package:news_aggregator/presentation/cubits/news_cubit.dart';
+import 'package:news_aggregator/presentation/cubits/theme_cubit.dart';
 import 'package:news_aggregator/presentation/pages/news_list_page.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +21,7 @@ void main() async {
   final dio = Dio();
   final rssDataSource = RssDataSource(dio: dio);
   final syncService = SyncService(rssDataSource, db);
+  final prefs = await SharedPreferences.getInstance();
 
   // Trigger initial sync
   syncService.sync();
@@ -26,17 +29,20 @@ void main() async {
   runApp(MyApp(
     db: db,
     syncService: syncService,
+    prefs: prefs,
   ));
 }
 
 class MyApp extends StatelessWidget {
   final ObjectBoxStore db;
   final SyncService syncService;
+  final SharedPreferences prefs;
 
   const MyApp({
     super.key,
     required this.db,
     required this.syncService,
+    required this.prefs,
   });
 
   @override
@@ -45,23 +51,33 @@ class MyApp extends StatelessWidget {
       providers: [
         RepositoryProvider.value(value: db),
         RepositoryProvider.value(value: syncService),
+        RepositoryProvider.value(value: prefs),
       ],
-      child: BlocProvider(
-        create: (context) => NewsCubit(db, syncService),
-        child: MaterialApp(
-          title: 'خبرخوان ایرانی',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('fa', 'IR'),
-          ],
-          locale: const Locale('fa', 'IR'),
-          home: const NewsListPage(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => NewsCubit(db, syncService)),
+          BlocProvider(create: (context) => ThemeCubit(prefs)),
+        ],
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, themeMode) {
+            return MaterialApp(
+              title: 'خبرخوان ایرانی',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeMode,
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('fa', 'IR'),
+              ],
+              locale: const Locale('fa', 'IR'),
+              home: const NewsListPage(),
+            );
+          },
         ),
       ),
     );
