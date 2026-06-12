@@ -68,6 +68,30 @@ class ObjectBoxStore implements NewsStorage {
         .map((q) => q.find());
   }
 
+  @override
+  Future<void> clearAllNews() async {
+    newsBox.removeAll();
+  }
+
+  @override
+  Future<void> updateNewsStatus(int id, {bool? isRead, bool? isBookmarked}) async {
+    final item = newsBox.get(id);
+    if (item != null) {
+      if (isRead != null) item.isRead = isRead;
+      if (isBookmarked != null) item.isBookmarked = isBookmarked;
+      newsBox.put(item);
+    }
+  }
+
+  @override
+  Stream<List<NewsItem>> watchBookmarks() {
+    return newsBox
+        .query(NewsItem_.isBookmarked.equals(true))
+        .order(NewsItem_.publishDate, flags: Order.descending)
+        .watch(triggerImmediately: true)
+        .map((q) => q.find());
+  }
+
   void _seedIfEmpty() {
     if (categoryBox.isEmpty()) {
       final defaults = [
