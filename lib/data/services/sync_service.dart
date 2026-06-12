@@ -6,46 +6,39 @@ import '../../domain/entities/news_item.dart';
 class SyncService {
   final RssDataSource dataSource;
   final NewsStorage db;
-  final Map<String, String> feeds;
 
   SyncService(
     this.dataSource,
-    this.db, {
-    Map<String, String>? feeds,
-  }) : feeds = feeds ??
-            {
-              'ISNA': 'https://www.isna.ir/rss',
-              'Mehr': 'https://www.mehrnews.com/rss',
-              'IRNA': 'https://www.irna.ir/rss',
-              'Tasnim': 'https://www.tasnimnews.com/fa/rss/feed/0/7/1/',
-            };
+    this.db,
+  );
 
   Future<void> sync() async {
-    final results = await Future.wait(
-      feeds.entries.map((entry) async {
-        try {
-          return await dataSource.fetchFeed(entry.value, entry.key);
-        } catch (e) {
-          // ignore: avoid_print
-          print('Error fetching feed ${entry.key}: $e');
-          return <NewsItem>[];
-        }
-      }),
-    );
+    final categories = await db.getAllCategories();
+    if (categories.isEmpty) return;
 
-    final allItems = results.expand((items) => items).toList();
-    if (allItems.isEmpty) return;
-
-    // Get all remoteIds from database to avoid duplicates
+    final List<NewsItem> allNewItems = [];
     final existingRemoteIds = db.getAllRemoteIds();
 
-    final newItems =
-        allItems.where((item) => !existingRemoteIds.contains(item.remoteId)).toList();
+    for (final category in categories) {
+      try {
+        final items = await dataSource.fetchFeed(category.remoteUrl, category.source);
+        
+        for (final item in items) {
+          if (!existingRemoteIds.contains(item.remoteId)) {
+            item.category.target = category;
+            allNewItems.add(item);
+          }
+        }
+      } catch (e) {
+        // ignore: avoid_print
+        print('Error fetching feed for ${category.name}: $e');
+      }
+    }
 
-    if (newItems.isNotEmpty) {
-      await db.insertMany(newItems);
+    if (allNewItems.isNotEmpty) {
+      await db.insertMany(allNewItems);
       // ignore: avoid_print
-      print('Synced ${newItems.length} new items');
+      print('Synced ${allNewItems.length} new items across ${categories.length} categories');
     }
   }
 }
