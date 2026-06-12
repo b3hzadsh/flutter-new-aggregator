@@ -9,15 +9,16 @@ class NetworkService {
 
   Future<bool> isIranianIp() async {
     try {
-      final response = await dio.get('https://ip-api.com/json');
-      return response.data['countryCode'] == 'IR';
+      final response = await dio.get('https://ipwho.is/');
+      return response.data['country_code'] == 'IR';
     } catch (_) {
       return false;
     }
   }
 
   Future<bool> hasInternet() async {
-    final List<ConnectivityResult> results = await connectivity.checkConnectivity();
+    final List<ConnectivityResult> results = await connectivity
+        .checkConnectivity();
     return !results.contains(ConnectivityResult.none);
   }
 }

@@ -32,7 +32,7 @@ void main() {
       final result = await networkService.isIranianIp();
 
       expect(result, isTrue);
-      verify(() => mockDio.get('https://ip-api.com/json')).called(1);
+      verify(() => mockDio.get('https://ipwho.is/')).called(1);
     });
 
     test('returns false when countryCode is not IR', () async {
