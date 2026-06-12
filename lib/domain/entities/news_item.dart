@@ -25,6 +25,7 @@ class NewsItem {
   
   bool isRead;
   bool isPriority;
+  bool isBookmarked;
 
   NewsItem({
     this.id = 0,
@@ -37,5 +38,6 @@ class NewsItem {
     required this.publishDate,
     this.isRead = false,
     this.isPriority = false,
+    this.isBookmarked = false,
   });
 }
