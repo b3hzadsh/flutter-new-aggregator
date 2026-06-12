@@ -1,20 +1,23 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../../objectbox.g.dart';
 import '../../domain/entities/news_item.dart';
 import '../../domain/entities/category.dart';
+import '../../domain/entities/feed_source.dart';
 import '../../domain/repositories/news_storage.dart';
 
 class ObjectBoxStore implements NewsStorage {
   final Store store;
   final Box<NewsItem> newsBox;
   final Box<Category> categoryBox;
+  final Box<FeedSource> feedSourceBox;
 
   ObjectBoxStore.fromStore(this.store)
     : newsBox = Box<NewsItem>(store),
-      categoryBox = Box<Category>(store) {
-    _seedIfEmpty();
-  }
+      categoryBox = Box<Category>(store),
+      feedSourceBox = Box<FeedSource>(store);
 
   static Future<ObjectBoxStore> create() async {
     final docsDir = await getApplicationDocumentsDirectory();
@@ -55,17 +58,79 @@ class ObjectBoxStore implements NewsStorage {
   }
 
   @override
-  Future<void> seedCategories(List<Category> categories) async {
-    categoryBox.putMany(categories);
+  Future<List<FeedSource>> getAllFeedSources() async {
+    return feedSourceBox.getAll();
   }
 
   @override
-  Stream<List<NewsItem>> watchItemsByCategory(int categoryId) {
-    return newsBox
-        .query(NewsItem_.category.equals(categoryId))
+  Future<void> syncCategoriesFromJson(String jsonPath) async {
+    final file = File(jsonPath);
+    if (!await file.exists()) return;
+
+    final data = json.decode(await file.readAsString());
+    final categoriesMap = data['categories'] as Map<String, dynamic>;
+
+    for (final entry in categoriesMap.entries) {
+      final catData = entry.value;
+      final category = Category(
+        remoteId: catData['id'],
+        name: catData['name'],
+      );
+
+      // Upsert category
+      final existingCat = categoryBox
+          .query(Category_.remoteId.equals(category.remoteId))
+          .build()
+          .findFirst();
+      if (existingCat != null) category.id = existingCat.id;
+      categoryBox.put(category);
+
+      final feedsData = catData['feeds'] as List;
+      for (final feedData in feedsData) {
+        final feed = FeedSource(
+          name: feedData['name'],
+          url: feedData['url'],
+          language: feedData['language'],
+          isLocalOnly: feedData['region'] == 'ایران',
+        );
+        feed.category.target = category;
+
+        // Upsert feed
+        final existingFeed = feedSourceBox
+            .query(FeedSource_.url.equals(feed.url))
+            .build()
+            .findFirst();
+        if (existingFeed != null) feed.id = existingFeed.id;
+        feedSourceBox.put(feed);
+      }
+    }
+  }
+
+  @override
+  Stream<List<NewsItem>> watchItemsByCategory(String categoryRemoteId) {
+    final query = categoryBox.query(Category_.remoteId.equals(categoryRemoteId)).build();
+    final category = query.findFirst();
+    query.close();
+    
+    if (category == null) return Stream.value([]);
+
+    final qBuilder = newsBox.query();
+    qBuilder.link(NewsItem_.feedSource, FeedSource_.category.equals(category.id));
+    
+    return qBuilder
         .order(NewsItem_.publishDate, flags: Order.descending)
         .watch(triggerImmediately: true)
         .map((q) => q.find());
+  }
+
+  @override
+  Future<void> deleteOldNews(DateTime cutoff) async {
+    final query = newsBox
+        .query(NewsItem_.publishDate.lessThan(cutoff.millisecondsSinceEpoch)
+            .and(NewsItem_.isBookmarked.equals(false)))
+        .build();
+    query.remove();
+    query.close();
   }
 
   @override
@@ -94,34 +159,6 @@ class ObjectBoxStore implements NewsStorage {
         .order(NewsItem_.publishDate, flags: Order.descending)
         .watch(triggerImmediately: true)
         .map((q) => q.find());
-  }
-
-  void _seedIfEmpty() {
-    if (categoryBox.isEmpty()) {
-      final defaults = [
-        Category(
-          name: 'ISNA',
-          remoteUrl: 'https://www.isna.ir/rss',
-          source: 'ISNA',
-        ),
-        Category(
-          name: 'Mehr',
-          remoteUrl: 'https://www.mehrnews.com/rss',
-          source: 'Mehr',
-        ),
-        Category(
-          name: 'IRNA',
-          remoteUrl: 'https://www.irna.ir/rss',
-          source: 'IRNA',
-        ),
-        Category(
-          name: 'Tasnim',
-          remoteUrl: 'https://www.tasnimnews.com/fa/rss/feed/0/7/1/',
-          source: 'Tasnim',
-        ),
-      ];
-      categoryBox.putMany(defaults);
-    }
   }
 
   @override
