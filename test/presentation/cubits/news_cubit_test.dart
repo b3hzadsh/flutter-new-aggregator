@@ -1,39 +1,46 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:news_aggregator/data/storage/objectbox_store.dart';
 import 'package:news_aggregator/data/services/sync_service.dart';
 import 'package:news_aggregator/domain/entities/news_item.dart';
+import 'package:news_aggregator/domain/entities/category.dart';
+import 'package:news_aggregator/domain/repositories/news_storage.dart';
 import 'package:news_aggregator/presentation/cubits/news_cubit.dart';
-import 'package:news_aggregator/objectbox.g.dart';
-import 'dart:io';
+import 'dart:async';
+import '../../mocks.dart';
 
 class MockSyncService extends Mock implements SyncService {}
 
 void main() {
-  late ObjectBoxStore store;
-  late NewsCubit cubit;
+  late MockNewsStorage mockStorage;
   late MockSyncService mockSyncService;
-  final testDir = Directory('test-db-cubit');
+  late NewsCubit cubit;
+  late StreamController<List<NewsItem>> allItemsController;
+  late StreamController<List<NewsItem>> categoryItemsController;
 
-  setUp(() async {
-    if (testDir.existsSync()) testDir.deleteSync(recursive: true);
-    final obxStore = await openStore(directory: testDir.path);
-    store = ObjectBoxStore.fromStore(obxStore);
+  setUp(() {
+    mockStorage = MockNewsStorage();
     mockSyncService = MockSyncService();
-    cubit = NewsCubit(store, mockSyncService);
+    allItemsController = StreamController<List<NewsItem>>.broadcast();
+    categoryItemsController = StreamController<List<NewsItem>>.broadcast();
+
+    when(() => mockStorage.watchAllItems()).thenAnswer((_) => allItemsController.stream);
+    when(() => mockStorage.watchItemsByCategory(any())).thenAnswer((_) => categoryItemsController.stream);
+
+    cubit = NewsCubit(mockStorage, mockSyncService);
   });
 
   tearDown(() async {
     await cubit.close();
-    store.close();
-    if (testDir.existsSync()) testDir.deleteSync(recursive: true);
+    await allItemsController.close();
+    await categoryItemsController.close();
   });
 
   test('initial state has empty list', () {
     expect(cubit.state.items, isEmpty);
+    expect(cubit.state.selectedCategory, isNull);
   });
 
-  test('emits news items when database changes', () async {
+  test('emits news items when database changes (all items)', () async {
     final item = NewsItem(
       remoteId: '1',
       title: 'Test News',
@@ -43,42 +50,68 @@ void main() {
       publishDate: DateTime.now(),
     );
 
-    store.newsBox.put(item);
+    allItemsController.add([item]);
 
     // Wait for stream to emit
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(Duration.zero);
 
     expect(cubit.state.items.length, 1);
     expect(cubit.state.items.first.title, 'Test News');
   });
 
-  test('search filters items', () async {
+  test('filters items by category', () async {
+    final category1 = Category(id: 1, name: 'Tech', remoteUrl: 'url1', source: 'source1');
+    
     final item1 = NewsItem(
       remoteId: '1',
-      title: 'Flutter News',
-      content: 'Content',
-      summary: 'Summary',
-      sourceName: 'Source',
-      publishDate: DateTime.now(),
-    );
-    final item2 = NewsItem(
-      remoteId: '2',
-      title: 'Dart News',
+      title: 'Tech News',
       content: 'Content',
       summary: 'Summary',
       sourceName: 'Source',
       publishDate: DateTime.now(),
     );
 
-    store.newsBox.putMany([item1, item2]);
+    // Initial state: watching all
+    verify(() => mockStorage.watchAllItems()).called(1);
 
-    await Future.delayed(const Duration(milliseconds: 100));
-    expect(cubit.state.items.length, 2);
+    // Select category
+    cubit.selectCategory(category1);
+    
+    expect(cubit.state.selectedCategory, category1);
+    verify(() => mockStorage.watchItemsByCategory(1)).called(1);
 
-    cubit.search('Flutter');
-    await Future.delayed(const Duration(milliseconds: 100));
+    categoryItemsController.add([item1]);
+    await Future.delayed(Duration.zero);
 
     expect(cubit.state.items.length, 1);
-    expect(cubit.state.items.first.title, 'Flutter News');
+    expect(cubit.state.items.first.title, 'Tech News');
+
+    // Deselect category
+    cubit.selectCategory(null);
+    expect(cubit.state.selectedCategory, isNull);
+    verify(() => mockStorage.watchAllItems()).called(1); // Second call
+  });
+
+  test('sync updates loading state', () async {
+    when(() => mockSyncService.sync()).thenAnswer((_) async {});
+
+    final syncFuture = cubit.sync();
+
+    expect(cubit.state.isLoading, isTrue);
+
+    await syncFuture;
+
+    expect(cubit.state.isLoading, isFalse);
+    expect(cubit.state.error, isNull);
+    verify(() => mockSyncService.sync()).called(1);
+  });
+
+  test('sync handles error', () async {
+    when(() => mockSyncService.sync()).thenThrow(Exception('Sync failed'));
+
+    await cubit.sync();
+
+    expect(cubit.state.isLoading, isFalse);
+    expect(cubit.state.error, contains('Sync failed'));
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 import '../../domain/entities/news_item.dart';
+import '../../domain/entities/category.dart';
 import '../../domain/repositories/news_storage.dart';
 import '../../data/services/sync_service.dart';
 
@@ -8,22 +9,27 @@ class NewsState {
   final List<NewsItem> items;
   final bool isLoading;
   final String? error;
+  final Category? selectedCategory;
 
   NewsState({
     required this.items,
     this.isLoading = false,
     this.error,
+    this.selectedCategory,
   });
 
   NewsState copyWith({
     List<NewsItem>? items,
     bool? isLoading,
     String? error,
+    Category? selectedCategory,
+    bool clearCategory = false,
   }) {
     return NewsState(
       items: items ?? this.items,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
+      selectedCategory: clearCategory ? null : (selectedCategory ?? this.selectedCategory),
     );
   }
 }
@@ -38,9 +44,23 @@ class NewsCubit extends Cubit<NewsState> {
   }
 
   void _subscribe() {
-    _subscription = db.watchAllItems().listen((items) {
+    _subscription?.cancel();
+    final stream = state.selectedCategory == null
+        ? db.watchAllItems()
+        : db.watchItemsByCategory(state.selectedCategory!.id);
+
+    _subscription = stream.listen((items) {
       emit(state.copyWith(items: items));
     });
+  }
+
+  void selectCategory(Category? category) {
+    if (category == null) {
+      emit(state.copyWith(clearCategory: true));
+    } else {
+      emit(state.copyWith(selectedCategory: category));
+    }
+    _subscribe();
   }
 
   Future<void> sync() async {
