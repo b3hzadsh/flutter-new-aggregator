@@ -34,7 +34,7 @@ void main() {
       () async {
     final objectBoxStore = ObjectBoxStore.fromStore(store);
     
-    final category = Category(remoteId: 'cat1', name: 'Category 1');
+    final category = Category(slug: 'cat1', name: 'Category 1');
     objectBoxStore.categoryBox.put(category);
 
     final feed = FeedSource(name: 'Feed 1', url: 'url1', language: 'fa');
@@ -49,10 +49,10 @@ void main() {
       sourceName: 'Source',
       publishDate: DateTime.now(),
     );
-    item.feedSource.target = feed;
+    item.feed.target = feed;
     await objectBoxStore.insertMany([item]);
 
-    final stream = objectBoxStore.watchItemsByCategory(category.remoteId);
+    final stream = objectBoxStore.watchItemsByCategory(category.slug);
     final results = await stream.first;
     expect(results, hasLength(1));
     expect(results.first.remoteId, '1');
@@ -148,7 +148,7 @@ void main() {
     expect(categories, isNotEmpty);
     
     // Check for a specific category from the JSON
-    final generalNews = categories.firstWhere((c) => c.remoteId == 'general_news');
+    final generalNews = categories.firstWhere((c) => c.slug == 'general_news');
     expect(generalNews.name, 'خبرهای عمومی');
     
     final feeds = await objectBoxStore.getAllFeedSources();
@@ -157,6 +157,7 @@ void main() {
     // Check for a specific feed
     final farsFeed = feeds.firstWhere((f) => f.url == 'https://www.farsnews.ir/rss');
     expect(farsFeed.name, 'خبرگزاری فارس');
-    expect(farsFeed.category.target?.remoteId, 'general_news');
+    expect(farsFeed.category.target?.slug, 'general_news');
   });
 }
+
