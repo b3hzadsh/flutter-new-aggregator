@@ -16,13 +16,11 @@ class MockThemeCubit extends Mock implements ThemeCubit {}
 
 void main() {
   late MockNewsStorage mockStorage;
-  late MockSyncService mockSyncService;
   late MockNewsCubit mockCubit;
   late MockThemeCubit mockThemeCubit;
 
   setUp(() {
     mockStorage = MockNewsStorage();
-    mockSyncService = MockSyncService();
     mockCubit = MockNewsCubit();
     mockThemeCubit = MockThemeCubit();
 
@@ -122,6 +120,15 @@ void main() {
 
     // Test Clear History click
     await tester.tap(find.text('پاک کردن تاریخچه'));
+    await tester.pumpAndSettle();
+
+    // Verify dialog is shown
+    expect(find.text('حذف تاریخچه'), findsOneWidget);
+
+    // Tap "Delete" in dialog
+    await tester.tap(find.text('حذف'));
+    await tester.pumpAndSettle();
+
     verify(() => mockCubit.clearDatabase()).called(1);
   });
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/repositories/news_storage.dart';
 import '../../domain/entities/category.dart';
 import '../cubits/news_cubit.dart';
 import '../cubits/theme_cubit.dart';
@@ -97,14 +96,35 @@ class _CategoryDrawerState extends State<CategoryDrawer> {
                         ),
                         const Divider(),
                         ListTile(
-                          leading: Icon(Icons.delete_sweep, color: Theme.of(context).colorScheme.error),
-                          title: Text(
-                            'پاک کردن تاریخچه',
-                            style: TextStyle(color: Theme.of(context).colorScheme.error),
-                          ),
+                          leading: Icon(Icons.delete_sweep,
+                              color: Theme.of(context).colorScheme.error),
+                          title: Text('پاک کردن تاریخچه',
+                              style: TextStyle(color: Theme.of(context).colorScheme.error)),
                           onTap: () {
-                            cubit.clearDatabase();
-                            Navigator.pop(context);
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('حذف تاریخچه'),
+                                content: const Text(
+                                    'آیا از حذف تمامی اخبار و نشان‌شده‌ها اطمینان دارید؟'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('انصراف'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      cubit.clearDatabase();
+                                      Navigator.pop(context); // Close dialog
+                                      Navigator.pop(context); // Close drawer
+                                    },
+                                    child: Text('حذف',
+                                        style: TextStyle(
+                                            color: Theme.of(context).colorScheme.error)),
+                                  ),
+                                ],
+                              ),
+                            );
                           },
                         ),
                       ],

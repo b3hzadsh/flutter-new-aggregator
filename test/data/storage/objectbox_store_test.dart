@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:news_aggregator/data/storage/objectbox_store.dart';
 import 'package:news_aggregator/objectbox.g.dart';
-import 'package:news_aggregator/domain/entities/category.dart';
 import 'package:news_aggregator/domain/entities/news_item.dart';
 
 void main() {

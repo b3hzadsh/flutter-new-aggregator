@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../sources/rss_data_source.dart';
 import '../../domain/repositories/news_storage.dart';
-import '../../domain/repositories/rss_parser.dart';
 import '../../domain/entities/news_item.dart';
 
 class SyncService {
