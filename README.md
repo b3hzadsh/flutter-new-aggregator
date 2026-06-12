@@ -1,7 +1,7 @@
 # news_aggregator
 
 A new Flutter project.
-gemini --resume "9982de27-7cea-4ec2-ab16-ff99a5bc6046"
+gemini --resume "a456acdf-1b34-47af-8774-32da4dc2d97b" 
 
 ## Getting Started
 
