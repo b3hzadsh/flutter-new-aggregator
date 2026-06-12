@@ -50,3 +50,6 @@ GEMINI.md
 QWEN.md
 .qwen/settings.json
 .qwen/settings.json.orig
+assets/validated_rss_feeds_20260612.json
+assets/test.py
+assets/rss_validation_report_20260612_223007.json
