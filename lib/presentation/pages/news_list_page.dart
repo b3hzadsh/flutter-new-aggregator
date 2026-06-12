@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubits/news_cubit.dart';
 import '../pages/news_detail_page.dart';
 import '../widgets/news_card.dart';
+import '../widgets/category_drawer.dart';
 
 class NewsListPage extends StatefulWidget {
   const NewsListPage({super.key});
@@ -30,51 +31,50 @@ class _NewsListPageState extends State<NewsListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () => context.read<NewsCubit>().sync(),
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              floating: true,
-              snap: true,
-              centerTitle: true,
-              title: const Text('تازه‌ترین اخبار'),
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(70),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SearchBar(
-                    controller: _searchController,
-                    hintText: 'جستجو...',
-                    onChanged: (value) => context.read<NewsCubit>().search(value),
-                    leading: const Icon(Icons.search),
-                    trailing: [
-                      if (_searchController.text.isNotEmpty)
-                        IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            setState(() {
-                              _searchController.clear();
-                            });
-                            context.read<NewsCubit>().search('');
-                          },
-                        ),
-                    ],
+    return BlocBuilder<NewsCubit, NewsState>(
+      builder: (context, state) {
+        return Scaffold(
+          drawer: const CategoryDrawer(),
+          body: RefreshIndicator(
+            onRefresh: () => context.read<NewsCubit>().sync(),
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  centerTitle: true,
+                  title: Text(state.selectedCategory?.name ?? 'تازه‌ترین اخبار'),
+                  bottom: PreferredSize(
+                    preferredSize: const Size.fromHeight(70),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SearchBar(
+                        controller: _searchController,
+                        hintText: 'جستجو...',
+                        onChanged: (value) => context.read<NewsCubit>().search(value),
+                        leading: const Icon(Icons.search),
+                        trailing: [
+                          if (_searchController.text.isNotEmpty)
+                            IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                setState(() {
+                                  _searchController.clear();
+                                });
+                                context.read<NewsCubit>().search('');
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            BlocBuilder<NewsCubit, NewsState>(
-              builder: (context, state) {
-                if (state.isLoading && state.items.isEmpty) {
-                  return const SliverFillRemaining(
+                if (state.isLoading && state.items.isEmpty)
+                  const SliverFillRemaining(
                     child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-
-                if (state.error != null && state.items.isEmpty) {
-                  return SliverFillRemaining(
+                  )
+                else if (state.error != null && state.items.isEmpty)
+                  SliverFillRemaining(
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -88,39 +88,36 @@ class _NewsListPageState extends State<NewsListPage> {
                         ],
                       ),
                     ),
-                  );
-                }
-
-                if (state.items.isEmpty) {
-                  return const SliverFillRemaining(
+                  )
+                else if (state.items.isEmpty)
+                  const SliverFillRemaining(
                     child: Center(child: Text('خبری یافت نشد')),
-                  );
-                }
-
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final item = state.items[index];
-                      return NewsCard(
-                        item: item,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => NewsDetailPage(item: item),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                    childCount: state.items.length,
+                  )
+                else
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final item = state.items[index];
+                        return NewsCard(
+                          item: item,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NewsDetailPage(item: item),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      childCount: state.items.length,
+                    ),
                   ),
-                );
-              },
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
