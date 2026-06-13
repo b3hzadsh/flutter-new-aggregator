@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dartz/dartz.dart' hide Order;
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as p;
@@ -8,6 +9,8 @@ import '../../domain/entities/news_item.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/feed_source.dart';
 import '../../domain/repositories/news_storage.dart';
+import '../../core/error/failures.dart';
+import '../../core/error/exceptions.dart';
 
 class ObjectBoxStore implements NewsStorage {
   final Store store;
@@ -23,7 +26,49 @@ class ObjectBoxStore implements NewsStorage {
   static Future<ObjectBoxStore> create() async {
     final docsDir = await getApplicationDocumentsDirectory();
     final store = await openStore(directory: p.join(docsDir.path, "news_db"));
-    return ObjectBoxStore.fromStore(store);
+    final instance = ObjectBoxStore.fromStore(store);
+    await instance._seedFromJson();
+    return instance;
+  }
+
+  Future<void> _seedFromJson() async {
+    if (!categoryBox.isEmpty()) return; // Already seeded
+
+    try {
+      final String jsonString = await rootBundle.loadString('assets/news_category_link.json');
+      final Map<String, dynamic> jsonData = json.decode(jsonString);
+      final categoriesMap = jsonData['categories'] as Map<String, dynamic>?;
+
+      if (categoriesMap == null) throw ParseException("Categories map is missing");
+
+      final List<Category> categoriesToInsert = [];
+      
+      categoriesMap.forEach((key, value) {
+        final category = Category(
+          slug: value['id'] ?? key,
+          name: value['name'] ?? key,
+        );
+
+        final feedsList = value['feeds'] as List<dynamic>?;
+        if (feedsList != null) {
+          for (final feedData in feedsList) {
+            final feedSource = FeedSource(
+              name: feedData['name'],
+              url: feedData['url'],
+              language: feedData['language'] ?? 'fa',
+              isLocalOnly: feedData['region'] == 'ایران',
+            );
+            category.feeds.add(feedSource);
+          }
+        }
+        categoriesToInsert.add(category);
+      });
+
+      categoryBox.putMany(categoriesToInsert);
+    } catch (e) {
+      if (e is ParseException) rethrow;
+      throw ParseException("Failed to parse category JSON: $e");
+    }
   }
 
   @override
@@ -54,8 +99,13 @@ class ObjectBoxStore implements NewsStorage {
   }
 
   @override
-  Future<List<Category>> getAllCategories() async {
-    return categoryBox.getAll();
+  Future<Either<Failure, List<Category>>> getAllCategories() async {
+    try {
+      final categories = categoryBox.getAll();
+      return Right(categories);
+    } catch (e) {
+      return Left(CacheFailure("Failed to get categories: $e"));
+    }
   }
 
   @override

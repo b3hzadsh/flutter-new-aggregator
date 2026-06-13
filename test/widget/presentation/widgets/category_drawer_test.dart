@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dartz/dartz.dart';
+import 'package:news_aggregator/core/error/failures.dart';
 import 'package:news_aggregator/presentation/widgets/category_drawer.dart';
 import 'package:news_aggregator/presentation/cubits/news_cubit.dart';
 import 'package:news_aggregator/presentation/cubits/theme_cubit.dart';
 import 'package:news_aggregator/domain/repositories/news_storage.dart';
 import 'package:news_aggregator/domain/entities/category.dart';
-import 'package:news_aggregator/data/services/sync_service.dart';
 
 class MockNewsStorage extends Mock implements NewsStorage {}
-class MockSyncService extends Mock implements SyncService {}
 class MockNewsCubit extends Mock implements NewsCubit {}
 class MockThemeCubit extends Mock implements ThemeCubit {}
 
@@ -43,7 +43,7 @@ void main() {
       Category(id: 2, slug: 'sports', name: 'ورزشی'),
     ];
 
-    when(() => mockStorage.getAllCategories()).thenAnswer((_) async => categories);
+    when(() => mockStorage.getAllCategories()).thenAnswer((_) async => Right(categories));
 
     await tester.pumpWidget(
       MaterialApp(
@@ -85,7 +85,7 @@ void main() {
   });
 
   testWidgets('CategoryDrawer displays saved news and clear history', (WidgetTester tester) async {
-    when(() => mockStorage.getAllCategories()).thenAnswer((_) async => []);
+    when(() => mockStorage.getAllCategories()).thenAnswer((_) async => const Right(<Category>[]));
 
     await tester.pumpWidget(
       MaterialApp(
@@ -134,7 +134,7 @@ void main() {
 
   testWidgets('CategoryDrawer shows loading indicator while fetching categories', (WidgetTester tester) async {
     // Return a future that doesn't complete immediately
-    when(() => mockStorage.getAllCategories()).thenAnswer((_) => Future.delayed(const Duration(seconds: 1), () => <Category>[]));
+    when(() => mockStorage.getAllCategories()).thenAnswer((_) => Future.delayed(const Duration(seconds: 1), () => const Right(<Category>[])));
 
     await tester.pumpWidget(
       MaterialApp(

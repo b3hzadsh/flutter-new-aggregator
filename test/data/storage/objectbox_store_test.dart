@@ -144,7 +144,8 @@ void main() {
     
     await objectBoxStore.syncCategoriesFromJson(jsonPath);
     
-    final categories = await objectBoxStore.getAllCategories();
+    final result = await objectBoxStore.getAllCategories();
+    final categories = result.getOrElse(() => []);
     expect(categories, isNotEmpty);
     
     // Check for a specific category from the JSON
