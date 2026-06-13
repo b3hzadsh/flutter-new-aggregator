@@ -20,9 +20,16 @@ class SyncService {
     // 2. Fetch all feed sources
     final allFeeds = await db.getAllFeedSources();
     final activeFeeds = allFeeds.where((f) {
-      if (f.isLocalOnly && !isIranianIp) return false;
-      return true;
+      // If in Iran, keep only local feeds. If outside, keep only global feeds.
+      return f.isLocalOnly == isIranianIp;
     }).toList();
+    
+    debugPrint('isIranianIp: $isIranianIp');
+    debugPrint('Total feeds: ${allFeeds.length}');
+    debugPrint('Active feeds: ${activeFeeds.length}');
+    for (var f in activeFeeds) {
+      debugPrint('Active feed: ${f.name}, isLocalOnly: ${f.isLocalOnly}');
+    }
 
     if (activeFeeds.isEmpty) return;
 

@@ -14,6 +14,7 @@ class RssDataSource implements RssParser {
       return parse(response.data.toString(), sourceName);
     } catch (e) {
       // Log or handle error appropriately in a real app
+      print("shit happend in fetchFeed $e");
       return [];
     }
   }
